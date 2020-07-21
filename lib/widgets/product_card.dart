@@ -4,22 +4,32 @@ import 'dart:ui';
 
 import 'package:flutter_svg/svg.dart';
 import 'package:g2r_market/pages/products/index.dart';
+import 'package:g2r_market/services/favorite.dart';
 
-class ProductCard extends StatelessWidget {
-
+class ProductCard extends StatefulWidget {
   ProductCard({
+    Key key,
     @required this.name,
     this.image,
     this.prices,
     this.minOrder,
-    this.id
-  });
+    this.id,
+    this.favorite,
+    this.auth
+  }) : super(key: key);
 
   final String name;
   final String image;
   final Map minOrder;
   final Map prices;
   final int id;
+  bool favorite;
+  final auth;
+
+  @override
+  _ProductCardState createState() => _ProductCardState();
+}
+class _ProductCardState extends State<ProductCard> {
 
   @override
   Widget build(BuildContext context) {
@@ -29,9 +39,9 @@ class ProductCard extends StatelessWidget {
       child: Container(
         height: 300,
         width: 100,
-        decoration:  (image != null)
+        decoration:  (widget.image != null)
         ? BoxDecoration(
-            image: DecorationImage(image: CachedNetworkImageProvider(image, headers: {'Host': 'g2r-market.mobile'}), fit: BoxFit.cover),
+            image: DecorationImage(image: CachedNetworkImageProvider(widget.image, headers: {'Host': 'g2r-market.mobile'}), fit: BoxFit.cover),
             borderRadius: BorderRadius.circular(13),
           )
         : BoxDecoration(
@@ -53,9 +63,12 @@ class ProductCard extends StatelessWidget {
                     color:Colors.white,
                     borderRadius: BorderRadius.circular(13)
                   ),
-                  child: Padding(
-                    padding: EdgeInsets.all(4),
-                    child: SvgPicture.asset('resources/svg/catalog/favorite-colored.svg')
+                  child: InkWell(
+                    child: Padding(
+                      padding: EdgeInsets.all(4),
+                      child: (widget.favorite != false) ? SvgPicture.asset('resources/svg/catalog/favorite-colored-active.svg') : SvgPicture.asset('resources/svg/catalog/favorite-colored.svg')
+                    ),
+                    onTap: () => __updateFavorite(),
                   )
                 ),
               ),
@@ -74,11 +87,11 @@ class ProductCard extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: <Widget>[
-                          Text(name, style: TextStyle(fontSize:18), maxLines: 2),
+                          Text(widget.name, style: TextStyle(fontSize:18), maxLines: 2),
                           SizedBox(height: 10),
-                          Text('${prices['min']}\$ - ${prices['max']}\$', style: TextStyle(fontSize:12, fontWeight: FontWeight.bold), maxLines: 2),
+                          Text('${widget.prices['min']}\$ - ${widget.prices['max']}\$', style: TextStyle(fontSize:12, fontWeight: FontWeight.bold), maxLines: 2),
                           SizedBox(height: 10),
-                          Text('От ${minOrder['value']} ${minOrder['type']}', style: TextStyle(fontSize:10), maxLines: 2)
+                          Text('От ${widget.minOrder['value']} ${widget.minOrder['type']}', style: TextStyle(fontSize:10), maxLines: 2)
                         ]
                       )
                     ),
@@ -90,7 +103,8 @@ class ProductCard extends StatelessWidget {
           onTap: () => {
             Navigator.push(context, MaterialPageRoute(
               builder: (context) => ProductPage(
-                  productId: id,
+                  productId: widget.id,
+                  auth: widget.auth,
                 )
               )
             )
@@ -98,5 +112,28 @@ class ProductCard extends StatelessWidget {
         ),
       )
     );
+  }
+
+  Future __updateFavorite() async
+  {
+    var function;
+
+    if(widget.auth != Null)
+    {
+      if (widget.favorite == true)
+      {
+        function = Favorite.removeProduct(await widget.auth, widget.id);
+
+      } else
+      {
+        function = Favorite.addProduct(await widget.auth, widget.id);
+      }
+
+      await function;
+
+      setState((){
+        widget.favorite =  (widget.favorite) ? false : true;
+      });
+    }
   }
 }

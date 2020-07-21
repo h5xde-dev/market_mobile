@@ -23,15 +23,16 @@ environment:
 dependencies:
   http:
   html:
+  url_launcher:
   flutter_spinkit:
   flutter_staggered_grid_view:
   cached_network_image:
   flutter_svg:
-  webview_flutter:
   sqflite:
   dart_amqp:
   country_icons:
   carousel_slider:
+  webview_flutter:
   path_provider:
   flutter:
     sdk: flutter

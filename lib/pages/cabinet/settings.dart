@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:g2r_market/helpers/navigator.dart';
 import 'package:g2r_market/pages/auth/sign_in_page.dart';
 import 'package:g2r_market/widgets/cabinet_button.dart';
 import 'package:g2r_market/helpers/db.dart';
@@ -105,7 +106,13 @@ class SettingsPage extends StatelessWidget {
                     child: spinkit
                   ),
                   SizedBox(height: 20),
-                  [null].contains(spinkit) ? __cabinetMenu() : Center(),
+                  [null].contains(spinkit)
+                  ? Expanded(
+                    child: ListView(
+                      children: [__cabinetMenu()]
+                    )
+                  )
+                  : Center(),
                 ],
               ),
             )
@@ -120,7 +127,7 @@ class SettingsPage extends StatelessWidget {
     await DBProvider.db.deleteAccountInfo();
     await DBProvider.db.deleteAuth();
     
-    Navigator.pushReplacement(context, MaterialPageRoute(
+    Navigator.pushReplacement(context, AnimatedSizeRoute(
         builder: (context) => LandingPage(selectedPage: 1)
       )
     );

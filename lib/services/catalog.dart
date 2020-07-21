@@ -1,5 +1,5 @@
 import 'dart:convert';
-
+import 'package:g2r_market/helpers/db.dart';
 import 'package:g2r_market/static/api_methods.dart';
 import 'dart:async';
 import 'package:http/http.dart' as http;
@@ -11,11 +11,18 @@ class Catalog {
   {    
     List productCards = [];
 
+    var auth = await DBProvider.db.getAuth(1);
+
     final response = await http.Client().get(
       MarketApi.getProducts + '?category=$category&page=$page',
-      headers: {
-        'Host': 'g2r-market.mobile'
-      }
+      headers: (auth != Null)
+      ? {
+          'Host': 'g2r-market.mobile',
+          'Authorization': 'Bearer ${auth['token']}'
+        }
+      : {
+          'Host': 'g2r-market.mobile',
+        }
     );
 
     if(response.statusCode == 200)
@@ -46,6 +53,7 @@ class Catalog {
           'price_max': item['product_prices'][0]['max'],
           'min_order': item['characteristics']['min_order']['value'],
           'order_type': item['characteristics']['min_order']['type'],
+          'favorite': (auth != Null && item['favorites'].isEmpty == false) ? true : false,
           'preview_image': avatar
         };
 
@@ -61,11 +69,18 @@ class Catalog {
   {    
     List productCards = [];
 
+    var auth = await DBProvider.db.getAuth(1);
+
     final response = await http.Client().get(
       MarketApi.getProduct + '?id=$productId',
-      headers: {
-        'Host': 'g2r-market.mobile'
-      }
+      headers: (auth != Null)
+      ? {
+          'Host': 'g2r-market.mobile',
+          'Authorization': 'Bearer ${auth['token']}'
+        }
+      : {
+          'Host': 'g2r-market.mobile',
+        }
     );
 
     if(response.statusCode == 200)
@@ -74,6 +89,8 @@ class Catalog {
       String avatar;
       List detailImages = [];
       List describleImages = [];
+
+      List productModels = [];
 
       Map data = jsonDecode(response.body);
 
@@ -104,6 +121,33 @@ class Catalog {
             }
           }
         }
+
+        if(item.containsKey('product_models') != false)
+        {
+          for (var productModel in item['product_models'])
+          {
+            var modelAvatar;
+
+            if(productModel.containsKey('downloads') != false)
+            {
+              modelAvatar = '$API_URL/storage/${productModel['downloads'][0]['path']}';
+            }
+
+            Map model = {
+              'id': productModel['id'],
+              'price_min': productModel['product_prices'][0]['min'],
+              'price_max': productModel['product_prices'][0]['max'],
+              'preview_image': modelAvatar,
+            };
+
+            for (var chars in productModel['characteristics'].entries)
+            {
+              model.addEntries([chars]);
+            }
+
+            productModels.add(model);
+          }
+        }
         
         Map product = {
           'id': item['id'],
@@ -114,7 +158,9 @@ class Catalog {
           'order_type': item['characteristics']['min_order']['type'],
           'preview_image': avatar,
           'describle_images': describleImages,
-          'detail_images': detailImages
+          'detail_images': detailImages,
+          'product_models': productModels,
+          'favorite': (auth != Null && item['favorites'].isEmpty == false) ? true : false,
         };
 
         for (var property in item['product_properties'])

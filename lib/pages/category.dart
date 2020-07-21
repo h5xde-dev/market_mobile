@@ -1,5 +1,6 @@
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:flutter/material.dart';
+import 'package:g2r_market/helpers/navigator.dart';
 import 'package:g2r_market/pages/products/catalog.dart';
 import 'package:g2r_market/widgets/category_button.dart';
 import 'package:g2r_market/services/categories.dart';
@@ -107,8 +108,8 @@ class _CategoryPageState extends State<CategoryPage> {
         return CategoryButton(
           text: Text(categories[index]['title'], overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 12),),
           color: Colors.white,
-          onPressed: () => Navigator.push(context, MaterialPageRoute(
-              builder: (context) => CatalogPage(category: categories[index], childs: categories[index]['childrens'])
+          onPressed: () => Navigator.push(context, AnimatedSizeRoute(
+              builder: (context) => CatalogPage(category: categories[index], childs: categories[index]['children'])
             )
           )
            /* () => setState((){

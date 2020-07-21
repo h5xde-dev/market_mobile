@@ -1,5 +1,6 @@
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+import 'package:g2r_market/helpers/navigator.dart';
 import 'package:g2r_market/pages/auth/sign_in_page.dart';
 import 'package:g2r_market/pages/category.dart';
 import 'package:g2r_market/widgets/category_card.dart';
@@ -129,7 +130,8 @@ class _HomePageState extends State<HomePage> {
           return CategoryCard(
             name: categories[index]['title'],
             image: categories[index]['banner'],
-            id: categories[index]['id']
+            id: categories[index]['id'],
+            children: categories[index]['children'],
           );
         } else
         {
@@ -150,7 +152,7 @@ class _HomePageState extends State<HomePage> {
                   ],
                 ),
                 onTap: () => {
-                  Navigator.push(context, MaterialPageRoute(
+                  Navigator.push(context, AnimatedScaleRoute(
                       builder: (context) => CategoryPage()
                     )
                   )
@@ -180,12 +182,12 @@ class _HomePageState extends State<HomePage> {
 
     [Null].contains(auth)
 
-    ? Navigator.push(context, MaterialPageRoute(
+    ? Navigator.push(context, AnimatedSizeRoute(
           builder: (context) => SignInPage()
         )
       )
 
-    : Navigator.push(context, MaterialPageRoute(
+    : Navigator.push(context, AnimatedSizeRoute(
           builder: (context) => LandingPage(selectedPage: 3)
         )
       );

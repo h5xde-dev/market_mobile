@@ -17,4 +17,8 @@ class MarketApi {
 
   static String getProducts = '$API_URL/api/mobile/catalog';
   static String getProduct = '$API_URL/api/mobile/catalog/product';
+
+  static String favoriteProductAdd = '$API_URL/api/mobile/favorite/product/add';
+  static String favoriteProductRemove = '$API_URL/api/mobile/favorite/product/remove';
+  static String favoriteProductGet = '$API_URL/api/mobile/favorite/product';
 }

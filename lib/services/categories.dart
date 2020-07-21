@@ -29,7 +29,8 @@ class Category {
         Map category = {
           'id': item['id'],
           'title': item['title'],
-          'banner': API_URL + "/assemble" + item['banner']
+          'banner': API_URL + "/assemble" + item['banner'],
+          'children': item['children']
         };
 
         mainCategoryCards.add(category);
