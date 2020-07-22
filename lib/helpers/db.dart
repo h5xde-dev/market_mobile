@@ -58,7 +58,8 @@ class DBProvider {
   newAccountInfo(UserBase newClient) async {
     final db = await database;
     //get the biggest id in the table
-    int id = 1;
+    var table = await db.rawQuery("SELECT MAX(id)+1 as id FROM Auth");
+    int id = table.first["id"] ?? 1;
     //insert to the table using the new id 
     var raw = await db.rawInsert(
         "INSERT Into Account (id, name, last_name, patronymic, birthday, phone, avatar)"
@@ -69,36 +70,46 @@ class DBProvider {
 
   updateAccountInfo(UserBase newClient) async {
     final db = await database;
+    var table = await db.rawQuery("SELECT MAX(id) as id FROM Account");
+    int id = table.first["id"] ?? 1;
     var res = await db.update("Account", newClient.toMap(),
-        where: "id = ?", whereArgs: [1]
+        where: "id = ?", whereArgs: [id]
     );
     return res;
   }
 
   deleteAccountInfo() async {
     final db = await database;
+    var table = await db.rawQuery("SELECT MAX(id) as id FROM Account");
+    int id = table.first["id"] ?? 1;
     var res = await db.delete("Account",
-      where: 'id = ?', whereArgs: [1]
+      where: 'id = ?', whereArgs: [id]
     );
     return res;
   }
 
   deleteAuth() async {
     final db = await database;
+    var table = await db.rawQuery("SELECT MAX(id) as id FROM Auth");
+    int id = table.first["id"] ?? 1;
     var res = await db.delete("Auth",
-      where: 'id = ?', whereArgs: [1]
+      where: 'id = ?', whereArgs: [id]
     );
     return res;
   }
 
-  getAuth(int id) async {
+  getAuth() async {
     final db = await database;
+    var table = await db.rawQuery("SELECT MAX(id) as id FROM Auth");
+    int id = table.first["id"] ?? 1;
     var res =await  db.query("Auth", where: "id = ?", whereArgs: [id]);
     return res.isNotEmpty ? res.first : Null ;
   }
 
-  getAccountInfo(int id) async {
+  getAccountInfo() async {
     final db = await database;
+    var table = await db.rawQuery("SELECT MAX(id) as id FROM Account");
+    int id = table.first["id"] ?? 1;
     var res =await  db.query("Account", where: "id = ?", whereArgs: [id]);
     return res.isNotEmpty ? res.first : Null ;
   }

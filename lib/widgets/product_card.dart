@@ -6,6 +6,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:g2r_market/pages/products/index.dart';
 import 'package:g2r_market/services/favorite.dart';
 
+// ignore: must_be_immutable
 class ProductCard extends StatefulWidget {
   ProductCard({
     Key key,
@@ -132,7 +133,7 @@ class _ProductCardState extends State<ProductCard> {
       await function;
 
       setState((){
-        widget.favorite =  (widget.favorite) ? false : true;
+        widget.favorite = (widget.favorite) ? false : true;
       });
     }
   }

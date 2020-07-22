@@ -148,7 +148,7 @@ class _CatalogPageState extends State<CatalogPage> {
   __productCards(products)
   {
 
-    var auth = DBProvider.db.getAuth(1);
+    var auth = DBProvider.db.getAuth();
 
     return StaggeredGridView.countBuilder(
       itemCount: products.length,

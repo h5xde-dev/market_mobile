@@ -71,34 +71,30 @@ class _FavoritePageState extends State<FavoritePage> {
       bottomNavigationBar: (widget.fromMain) ? null :  BottomNavBar(),
       body: Stack(
         children: <Widget>[
-          Container(
-            decoration: BoxDecoration(
-              color: Color.fromRGBO(247,247,247, 100)
-            ),
-          ),
           SafeArea(
             child: Padding(
               padding: EdgeInsets.symmetric(horizontal: 20),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
                   SizedBox(height:20),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
                       (widget.fromMain == true)
-                      ? Center()
+                      ? SizedBox(width: 20)
                       : InkWell(
                           child: Icon(Icons.arrow_back_ios),
                           onTap: () => Navigator.pop(context, true),
                         ),
                       Text('Избранное', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
-                      Center()
+                      SizedBox(width: 20)
                     ],
                   ),
                   Container(
                     margin: EdgeInsets.symmetric(vertical: 10),
-                    padding: EdgeInsets.symmetric(horizontal: 30, vertical: 5),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: <Widget>[
@@ -216,7 +212,7 @@ class _FavoritePageState extends State<FavoritePage> {
 
   Future __updateFavorite(product, data) async
   {
-    var auth = await DBProvider.db.getAuth(1);
+    var auth = await DBProvider.db.getAuth();
 
     if(auth != Null)
     {
@@ -234,7 +230,7 @@ class _FavoritePageState extends State<FavoritePage> {
 
   Future __getFavoritesInfo() async
   {
-    var auth = await DBProvider.db.getAuth(1);
+    var auth = await DBProvider.db.getAuth();
     
     if(auth == Null)
     {

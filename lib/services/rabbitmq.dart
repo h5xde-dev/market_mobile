@@ -7,7 +7,7 @@ class Settings {
 
   static Future getDelivery() async
   {
-    if(DBProvider.db.getAuth(1) != Null)
+    if(DBProvider.db.getAuth() != Null)
     {
       Client client = new Client(
         settings: ConnectionSettings(

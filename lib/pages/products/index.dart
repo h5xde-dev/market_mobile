@@ -11,6 +11,7 @@ import 'package:g2r_market/services/catalog.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:g2r_market/widgets/youtube_frame.dart';
 
+// ignore: must_be_immutable
 class ProductPage extends StatefulWidget {
 
   final int productId;

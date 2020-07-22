@@ -11,7 +11,7 @@ class Catalog {
   {    
     List productCards = [];
 
-    var auth = await DBProvider.db.getAuth(1);
+    var auth = await DBProvider.db.getAuth();
 
     final response = await http.Client().get(
       MarketApi.getProducts + '?category=$category&page=$page',
@@ -69,7 +69,7 @@ class Catalog {
   {    
     List productCards = [];
 
-    var auth = await DBProvider.db.getAuth(1);
+    var auth = await DBProvider.db.getAuth();
 
     final response = await http.Client().get(
       MarketApi.getProduct + '?id=$productId',

@@ -27,32 +27,27 @@ class Settings {
 
       var avatar = '';
 
-        var acc = data['account'][0];
-
-        var account = {
-          'last_name': acc['last_name'],
-          'patronymic': acc['patronymic'],
-          'birthday': acc['birthday'],
-          'phone': acc['phone']
-        };
 
         if(data.containsKey('avatar') != false)
         {
           avatar = API_URL + '/storage/' + data['avatar']['path'];
         }
 
-        UserBase user = UserBase.fromMap({
+        var userMap = {
             'name': data['name'],
-            'last_name': account['last_name'],
-            'patronymic': account['patronymic'],
-            'birthday': account['birthday'],
-            'phone': account['phone'],
             'avatar': avatar,
-        });
+        };
 
-        var test = await DBProvider.db.getAccountInfo(1);
+        for( var acc in data['account'].values )
+        {
+          userMap.addEntries([MapEntry(acc['code'], acc['value'])]);
+        }
 
-        if(test != Null)
+        UserBase user = UserBase.fromMap(userMap);
+
+        var accountCreated = await DBProvider.db.getAccountInfo();
+
+        if(accountCreated != Null)
         {
           await DBProvider.db.updateAccountInfo(user);
           

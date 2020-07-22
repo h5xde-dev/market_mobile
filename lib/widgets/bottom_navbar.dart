@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:g2r_market/helpers/navigator.dart';
 import 'package:g2r_market/landing_page.dart';
+import 'package:g2r_market/pages/cabinet/favorites.dart';
 
 class BottomNavBar extends StatelessWidget {
   const BottomNavBar({
@@ -21,7 +23,7 @@ class BottomNavBar extends StatelessWidget {
         children: <Widget>[
           BottomNavItem(
             iconPath: 'resources/svg/main/home.svg',
-            isActive: (activeId ==1) ? true : false,
+            isActive: (activeId == 1) ? true : false,
             onTap: () => Navigator.push(context, MaterialPageRoute(
                 builder: (context) => LandingPage(selectedPage: 0)
               )
@@ -30,8 +32,8 @@ class BottomNavBar extends StatelessWidget {
           BottomNavItem(
             iconPath: 'resources/svg/main/list.svg',
             isActive: (activeId == 2) ? true : false,
-            onTap: () => Navigator.push(context, MaterialPageRoute(
-                builder: (context) => LandingPage(selectedPage: 1)
+            onTap: () => Navigator.push(context, AnimatedSizeRoute(
+                builder: (context) => FavoritePage(fromMain: false)
               )
             ),
           ),

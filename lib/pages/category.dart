@@ -53,18 +53,9 @@ class _CategoryPageState extends State<CategoryPage> {
 
   __content(context, data, spinkit)
   {
-
-    Size size = MediaQuery.of(context).size;
-
     return Scaffold(
       body: Stack(
         children: <Widget>[
-          Container(
-            height: size.height * .35,
-            decoration: BoxDecoration(
-              color: Color.fromRGBO(247,247,247, 100)
-            ),
-          ),
           SafeArea(
             child: Padding(
               padding: EdgeInsets.symmetric(horizontal: 20),
@@ -83,7 +74,7 @@ class _CategoryPageState extends State<CategoryPage> {
                     ],
                   ),
                   Container(
-                    margin: EdgeInsets.symmetric(vertical: 30),
+                    margin: EdgeInsets.symmetric(vertical: 10),
                     padding: EdgeInsets.symmetric(horizontal: 30, vertical: 5),
                     child: Center()
                   ),
@@ -102,11 +93,12 @@ class _CategoryPageState extends State<CategoryPage> {
 
   __categoriesList(categories)
   {
-    return ListView.builder(
+    return GridView.builder(
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2, crossAxisSpacing: 4),
       itemCount: categories.length,
-      itemBuilder: (context, index){
+      itemBuilder: (BuildContext context, int index) {
         return CategoryButton(
-          text: Text(categories[index]['title'], overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 12),),
+          text: Text(categories[index]['title'], overflow: TextOverflow.clip, style: TextStyle(fontSize: 12), textAlign: TextAlign.center,),
           color: Colors.white,
           onPressed: () => Navigator.push(context, AnimatedSizeRoute(
               builder: (context) => CatalogPage(category: categories[index], childs: categories[index]['children'])
@@ -118,8 +110,7 @@ class _CategoryPageState extends State<CategoryPage> {
             _loaded = true;
           }) */
         );
-      }
-    );
+      });
   }
 
   Future __getContent() async

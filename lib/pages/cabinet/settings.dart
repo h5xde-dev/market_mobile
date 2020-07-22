@@ -175,7 +175,7 @@ class SettingsPage extends StatelessWidget {
 
   Future __getUserInfo() async
   {
-    var auth = await DBProvider.db.getAuth(1);
+    var auth = await DBProvider.db.getAuth();
     
     if(auth == Null)
     {
@@ -184,7 +184,7 @@ class SettingsPage extends StatelessWidget {
 
     await Settings.getAccountInfo(auth);
 
-    var userInfo = await DBProvider.db.getAccountInfo(1);
+    var userInfo = await DBProvider.db.getAccountInfo();
 
     return userInfo;
   }

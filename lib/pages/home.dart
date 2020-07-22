@@ -178,7 +178,7 @@ class _HomePageState extends State<HomePage> {
 
   Future __checkAuth(context) async
   {
-    var auth = await DBProvider.db.getAuth(1);
+    var auth = await DBProvider.db.getAuth();
 
     [Null].contains(auth)
 

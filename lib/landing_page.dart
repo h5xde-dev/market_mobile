@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:g2r_market/pages/cabinet/favorites.dart';
 import 'package:g2r_market/pages/cabinet/settings.dart';
-import 'package:g2r_market/pages/category.dart';
 import 'package:g2r_market/pages/home.dart';
 import 'package:flutter/services.dart';
 
+// ignore: must_be_immutable
 class LandingPage extends StatefulWidget {
   
   int selectedPage;
@@ -32,7 +32,6 @@ class _LandingPageState extends State<LandingPage> {
     pageList.add(FavoritePage(fromMain: true));
     pageList.add(HomePage());
     pageList.add(SettingsPage(fromMain: true));
-    pageList.add(CategoryPage());
     super.initState();
   }
   
@@ -44,7 +43,7 @@ class _LandingPageState extends State<LandingPage> {
         children: pageList,
       ),
       bottomNavigationBar: Container(
-        padding: EdgeInsets.symmetric(horizontal: 40, vertical: 10),
+        padding: EdgeInsets.symmetric(horizontal: 40, vertical: 5),
         height: 80,
         color: Colors.white,
         child: Row(
