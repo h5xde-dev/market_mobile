@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:g2r_market/pages/cabinet/favorites.dart';
 import 'package:g2r_market/pages/cabinet/settings.dart';
 import 'package:g2r_market/pages/category.dart';
 import 'package:g2r_market/pages/home.dart';
@@ -28,9 +29,9 @@ class _LandingPageState extends State<LandingPage> {
         DeviceOrientation.portraitUp,
     ]);
     pageList.add(HomePage());
+    pageList.add(FavoritePage(fromMain: true));
     pageList.add(HomePage());
-    pageList.add(HomePage());
-    pageList.add(SettingsPage(fromMain: true,));
+    pageList.add(SettingsPage(fromMain: true));
     pageList.add(CategoryPage());
     super.initState();
   }

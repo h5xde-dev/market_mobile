@@ -21,9 +21,9 @@ class BottomNavBar extends StatelessWidget {
         children: <Widget>[
           BottomNavItem(
             iconPath: 'resources/svg/main/home.svg',
-            isActive: (activeId == 1) ? true : false,
+            isActive: (activeId ==1) ? true : false,
             onTap: () => Navigator.push(context, MaterialPageRoute(
-                builder: (context) => LandingPage()
+                builder: (context) => LandingPage(selectedPage: 0)
               )
             ),
           ),
@@ -31,7 +31,7 @@ class BottomNavBar extends StatelessWidget {
             iconPath: 'resources/svg/main/list.svg',
             isActive: (activeId == 2) ? true : false,
             onTap: () => Navigator.push(context, MaterialPageRoute(
-                builder: (context) => LandingPage()
+                builder: (context) => LandingPage(selectedPage: 1)
               )
             ),
           ),
@@ -39,7 +39,7 @@ class BottomNavBar extends StatelessWidget {
             iconPath: 'resources/svg/main/order.svg',
             isActive: (activeId == 3) ? true : false,
             onTap: () => Navigator.push(context, MaterialPageRoute(
-                builder: (context) => LandingPage()
+                builder: (context) => LandingPage(selectedPage: 2)
               )
             ),
           ),
