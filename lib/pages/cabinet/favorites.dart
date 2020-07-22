@@ -5,6 +5,7 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:flutter/material.dart';
 import 'package:g2r_market/helpers/db.dart';
 import 'package:g2r_market/helpers/navigator.dart';
+import 'package:g2r_market/pages/auth/sign_in_page.dart';
 import 'package:g2r_market/pages/products/index.dart';
 import 'package:g2r_market/services/favorite.dart';
 import 'package:g2r_market/widgets/bottom_navbar.dart';
@@ -55,8 +56,8 @@ class _FavoritePageState extends State<FavoritePage> {
           case ConnectionState.waiting:
             return __content(context, null, spinkit);
           default:
-            if (snapshot.hasError)
-              return __content(context, null, spinkit);
+            if (snapshot.hasError || snapshot.data == 'NOT_AUTHORIZED')
+              return SignInPage(fromMain: widget.fromMain,);
             else {
               return __content(context, snapshot.data, null);
             }
@@ -234,7 +235,7 @@ class _FavoritePageState extends State<FavoritePage> {
     
     if(auth == Null)
     {
-      return null;
+      return 'NOT_AUTHORIZED';
     }
 
     var userInfo = await Favorite.getProducts(auth);

@@ -40,7 +40,7 @@ class SettingsPage extends StatelessWidget {
             return __content(context, null, spinkit);
           default:
             if (snapshot.hasError || snapshot.data == null)
-              return SignInPage();
+              return SignInPage(fromMain: fromMain);
             else {
               return __content(context, snapshot.data, null);
             }

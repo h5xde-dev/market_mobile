@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'dart:ui';
 
 import 'package:flutter_svg/svg.dart';
+import 'package:g2r_market/helpers/navigator.dart';
+import 'package:g2r_market/pages/auth/sign_in_page.dart';
 import 'package:g2r_market/pages/products/index.dart';
 import 'package:g2r_market/services/favorite.dart';
 
@@ -119,7 +121,7 @@ class _ProductCardState extends State<ProductCard> {
   {
     var function;
 
-    if(widget.auth != Null)
+    if(await widget.auth != Null)
     {
       if (widget.favorite == true)
       {
@@ -135,6 +137,12 @@ class _ProductCardState extends State<ProductCard> {
       setState((){
         widget.favorite = (widget.favorite) ? false : true;
       });
+    } else
+    {
+      Navigator.push(context, AnimatedSizeRoute(
+          builder: (context) => SignInPage()
+        )
+      );
     }
   }
 }
