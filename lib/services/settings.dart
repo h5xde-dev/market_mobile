@@ -64,31 +64,44 @@ class Settings {
     return result;
   }
 
-   static Future<bool> changeAccountInfo(auth, name, lastName, patronymic, birthday, phone) async
+   static Future<bool> changeAccountInfo(auth, name, lastName, patronymic, birthday, phone, avatar) async
   {
 
     bool result = false;
 
-    final response = await http.Client().post(
-      MarketApi.accountInfoUpdate,
-      headers: {
-        'Host': 'g2r-market.mobile',
-        'Authorization': 'Bearer ${auth['token']}'
-      },
-      body: {
-        'name': name,
-        'last_name': lastName,
-        'patronymic': patronymic,
-        'birthday': birthday,
-        'phone': phone,
-      }
+    final Map<String, String> body = {
+      'name': name,
+      'last_name': lastName,
+      'patronymic': patronymic,
+      'birthday': birthday,
+      'phone': phone,
+    };
+
+    final request = http.MultipartRequest(
+      "POST",
+      Uri.parse(MarketApi.accountInfoUpdate),
     );
 
-    if(response.statusCode == 200)
-    {
-      
-      await Settings.getAccountInfo(auth);
+    request.headers.addAll({
+      'Host': 'g2r-market.mobile',
+      'Authorization': 'Bearer ${auth['token']}'
+    });
 
+    request.fields.addEntries(body.entries);
+
+    if(avatar is !String)
+    {
+      request.files.add(await http.MultipartFile.fromPath(
+        'avatar',
+        avatar.path
+      ));
+    }
+
+    var response = await request.send();
+
+    if (response.statusCode == 200) 
+    {
+      await Settings.getAccountInfo(auth);
       result = true;
     }
 

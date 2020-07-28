@@ -423,7 +423,8 @@ class _AccountEditPageState extends State<AccountEditPage> {
         (lastNameController.text == null) ? data['last_name'] : lastNameController.text,
         (patronymicController.text == null) ? data['patronymic'] : patronymicController.text,
         (birthdayController.text == null) ? data['birthday'] : birthdayController.text,
-        (phoneController.text == null) ? data['phone'] : phoneController.text
+        (phoneController.text == null) ? data['phone'] : phoneController.text,
+        (avatar == null) ? data['avatar'] : avatar.file
       );
 
       if(result == false)
