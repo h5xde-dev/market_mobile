@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:camera/camera.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_masked_text/flutter_masked_text.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
@@ -254,15 +255,21 @@ class _AccountEditPageState extends State<AccountEditPage> {
                         children: <Widget>[
                           CustomRaisedButton(
                             child: Icon(Icons.filter),
-                            onPressed: () => {
-                              cameraController.dispose(),
+                            onPressed: () async {
+                              cameraController.dispose();
+
+                              File _avatar = await FilePicker.getFile(
+                                type: FileType.custom,
+                                allowedExtensions: ['jpg','png','jpeg']
+                              ); 
 
                               setState((){
                                 userInfo = data;
                                 _loaded = true;
                                 cameras = cameras;
+                                avatar = FileImage(_avatar);
                                 cameraController = null;
-                              })
+                              });
                             }
                           ),
                           SizedBox(width: 10),
@@ -271,8 +278,6 @@ class _AccountEditPageState extends State<AccountEditPage> {
                             onPressed: () async {
 
                               String path = join(
-                                // Store the picture in the temp directory.
-                                // Find the temp directory using the `path_provider` plugin.
                                 (await getTemporaryDirectory()).path,
                                 '${DateTime.now()}.png',
                               );
@@ -427,16 +432,20 @@ class _AccountEditPageState extends State<AccountEditPage> {
         (avatar == null) ? data['avatar'] : avatar.file
       );
 
+      setState(() {
+        _loaded = false;
+      });
+
       if(result == false)
       {
         //return null;
       }
-    }
-
-    setState(() {
+    } else
+    {
+      setState(() {
         widget.errors = errors;
-    });
-
+      });
+    }
   }
 
   Future __getUserInfo() async
