@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:g2r_market/helpers/navigator.dart';
 import 'package:g2r_market/pages/auth/sign_in_page.dart';
+import 'package:g2r_market/pages/cabinet/account_edit.dart';
 import 'package:g2r_market/widgets/cabinet_button.dart';
 import 'package:g2r_market/helpers/db.dart';
 import 'package:g2r_market/landing_page.dart';
@@ -92,10 +93,15 @@ class SettingsPage extends StatelessWidget {
                       children: <Widget>[
                         [null].contains(spinkit) ?
                         Center(
-                          child: CircleAvatar(
-                            radius: 40,
-                            backgroundImage: CachedNetworkImageProvider(data['avatar'], headers: {'Host': 'g2r-market.mobile'}),
-                          )
+                          child: (data['avatar'] != '') 
+                          ? CircleAvatar(
+                              radius: 40,
+                              backgroundImage: CachedNetworkImageProvider(data['avatar'], headers: {'Host': 'g2r-market.mobile'}),
+                            )
+                          : CircleAvatar(
+                              radius: 40,
+                              backgroundColor: Colors.deepPurple[700],
+                            )
                         ) : Center(),
                         SizedBox(height:10),
                         [null].contains(spinkit) ? Text("${data['name']}  ${data['last_name'] ?? ''}", style: TextStyle(fontSize: 20),) : Center(),
@@ -108,8 +114,11 @@ class SettingsPage extends StatelessWidget {
                   SizedBox(height: 20),
                   [null].contains(spinkit)
                   ? Expanded(
-                    child: ListView(
-                      children: [__cabinetMenu()]
+                    child: RefreshIndicator(
+                       onRefresh: () => __updateUserInfo(context),
+                       child: ListView(
+                          children: [__cabinetMenu(context)]
+                        )
                     )
                   )
                   : Center(),
@@ -133,7 +142,7 @@ class SettingsPage extends StatelessWidget {
     );
   }
 
-  Widget __cabinetMenu()
+  Widget __cabinetMenu(context)
   {
     return Column(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -144,7 +153,12 @@ class SettingsPage extends StatelessWidget {
           icon: SvgPicture.asset('resources/svg/main/user.svg'),
           color: Colors.white,
           width: 300,
-          onPressed: (){},
+          onPressed: (){
+            Navigator.push(context, AnimatedSizeRoute(
+                builder: (context) => AccountEditPage()
+              )
+            );
+          },
         ),
         CabinetButton(
           text: Text('Мои профили'),
@@ -170,6 +184,14 @@ class SettingsPage extends StatelessWidget {
           onPressed: (){},
         ),
       ]
+    );
+  }
+
+  Future __updateUserInfo(context) async
+  {
+    Navigator.push(context, AnimatedSizeRoute(
+        builder: (context) => LandingPage(selectedPage: 3)
+      )
     );
   }
 

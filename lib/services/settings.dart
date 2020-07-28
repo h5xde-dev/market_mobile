@@ -27,39 +27,71 @@ class Settings {
 
       var avatar = '';
 
-
         if(data.containsKey('avatar') != false)
         {
           avatar = API_URL + '/storage/' + data['avatar']['path'];
         }
 
-        var userMap = {
-            'name': data['name'],
-            'avatar': avatar,
-        };
+          var userMap = {
+              'name': data['name'],
+              'avatar': avatar,
+          };
 
-        for( var acc in data['account'].values )
-        {
-          userMap.addEntries([MapEntry(acc['code'], acc['value'])]);
-        }
+          if(data.containsKey('account'))
+          {
+            for( var acc in data['account'].values )
+            {
+              userMap.addEntries([MapEntry(acc['code'], acc['value'])]);
+            }
+          }
 
-        UserBase user = UserBase.fromMap(userMap);
+          UserBase user = UserBase.fromMap(userMap);
 
-        var accountCreated = await DBProvider.db.getAccountInfo();
+          var accountCreated = await DBProvider.db.getAccountInfo();
 
-        if(accountCreated != Null)
-        {
-          await DBProvider.db.updateAccountInfo(user);
-          
-        } else
-        {
-          await DBProvider.db.newAccountInfo(user);
-        }
+          if(accountCreated != Null)
+          {
+            await DBProvider.db.updateAccountInfo(user);
+            
+          } else
+          {
+            await DBProvider.db.newAccountInfo(user);
+          }
 
         result = true;
     }
 
     return result;
+  }
 
+   static Future<bool> changeAccountInfo(auth, name, lastName, patronymic, birthday, phone) async
+  {
+
+    bool result = false;
+
+    final response = await http.Client().post(
+      MarketApi.accountInfoUpdate,
+      headers: {
+        'Host': 'g2r-market.mobile',
+        'Authorization': 'Bearer ${auth['token']}'
+      },
+      body: {
+        'name': name,
+        'last_name': lastName,
+        'patronymic': patronymic,
+        'birthday': birthday,
+        'phone': phone,
+      }
+    );
+
+    if(response.statusCode == 200)
+    {
+      
+      await Settings.getAccountInfo(auth);
+
+      result = true;
+    }
+
+    return result;
   }
 }

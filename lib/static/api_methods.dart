@@ -8,12 +8,14 @@ const REDIRECT_URL = 'http://localhost/';
 class MarketApi {
 
   static String authUrl = '$API_URL/oauth/token';
+  static String registerUrl = '$API_URL/api/mobile/register';
 
   static String mainUrl = '$API_URL/api/mobile/categories?type=popular';
 
   static String fullCatalog = '$API_URL/api/mobile/categories';
 
   static String accountInfo = '$API_URL/api/mobile/account';
+  static String accountInfoUpdate = '$API_URL/api/mobile/account/edit';
 
   static String getProducts = '$API_URL/api/mobile/catalog';
   static String getProduct = '$API_URL/api/mobile/catalog/product';

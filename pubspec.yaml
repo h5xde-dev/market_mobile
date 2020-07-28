@@ -28,12 +28,16 @@ dependencies:
   flutter_staggered_grid_view:
   cached_network_image:
   flutter_svg:
+  flutter_masked_text:
+  camera:
+  file_picker:
   sqflite:
   dart_amqp:
   country_icons:
   carousel_slider:
   webview_flutter:
   path_provider:
+  path:
   flutter:
     sdk: flutter
 
