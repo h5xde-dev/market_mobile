@@ -17,6 +17,11 @@ class MarketApi {
   static String accountInfo = '$API_URL/api/mobile/account';
   static String accountInfoUpdate = '$API_URL/api/mobile/account/edit';
 
+  static String getBuyers = '$API_URL/api/mobile/profile/buyer';
+  static String getSellers = '$API_URL/api/mobile/profile/seller';
+
+  static String getProfileInfo = '$API_URL/api/mobile/profile/index';
+
   static String getProducts = '$API_URL/api/mobile/catalog';
   static String getProduct = '$API_URL/api/mobile/catalog/product';
 

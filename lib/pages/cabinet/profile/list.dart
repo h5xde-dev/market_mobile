@@ -6,28 +6,28 @@ import 'package:flutter/material.dart';
 import 'package:g2r_market/helpers/db.dart';
 import 'package:g2r_market/helpers/navigator.dart';
 import 'package:g2r_market/pages/auth/sign_in_page.dart';
-import 'package:g2r_market/pages/products/index.dart';
-import 'package:g2r_market/services/favorite.dart';
+import 'package:g2r_market/pages/cabinet/profile/profile.dart';
+import 'package:g2r_market/services/profile.dart';
 import 'package:g2r_market/widgets/bottom_navbar.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
-class FavoritePage extends StatefulWidget {
+class ProfileListPage extends StatefulWidget {
   
   final auth;
   final fromMain;
 
-  FavoritePage({
+  ProfileListPage({
     Key key,
-    this.fromMain,
+    this.fromMain: false,
     this.auth
   }) : super(key: key);
 
   @override
-  _FavoritePageState createState() => _FavoritePageState();
+  _ProfileListPageState createState() => _ProfileListPageState();
 }
 
 
-class _FavoritePageState extends State<FavoritePage> {
+class _ProfileListPageState extends State<ProfileListPage> {
 
   bool _loaded = false;
   var _data;
@@ -48,7 +48,7 @@ class _FavoritePageState extends State<FavoritePage> {
     return (_loaded != false)
     ? __content(context, _data, null)
     : FutureBuilder(
-      future: __getFavoritesInfo(),
+      future: __getProfilesList(),
       builder: (BuildContext context, AsyncSnapshot snapshot){
         switch (snapshot.connectionState) {
           case ConnectionState.none:
@@ -56,7 +56,7 @@ class _FavoritePageState extends State<FavoritePage> {
           case ConnectionState.waiting:
             return __content(context, null, spinkit);
           default:
-            if (snapshot.hasError || snapshot.data == 'NOT_AUTHORIZED')
+            if (snapshot.hasError || snapshot.data == null)
               return SignInPage(fromMain: widget.fromMain,);
             else {
               return __content(context, snapshot.data, null);
@@ -69,7 +69,7 @@ class _FavoritePageState extends State<FavoritePage> {
   __content(context, data, spinkit)
   {
     return Scaffold(
-      bottomNavigationBar: (widget.fromMain) ? null :  BottomNavBar(activeId: 1,),
+      bottomNavigationBar: (widget.fromMain) ? null :  BottomNavBar(),
       body: Stack(
         children: <Widget>[
           SafeArea(
@@ -90,7 +90,7 @@ class _FavoritePageState extends State<FavoritePage> {
                           child: Icon(Icons.arrow_back_ios),
                           onTap: () => Navigator.pop(context, true),
                         ),
-                      Text('Избранное', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
+                      Text('Профили', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
                       SizedBox(width: 20)
                     ],
                   ),
@@ -107,7 +107,7 @@ class _FavoritePageState extends State<FavoritePage> {
                               borderRadius: BorderRadius.circular(13),
                               border: Border.all(color: Colors.black54)
                             ),
-                            child: Text('Продукты'),
+                            child: Text('Продавец'),
                           )
                         ),
                         SizedBox(width: 20),
@@ -119,14 +119,14 @@ class _FavoritePageState extends State<FavoritePage> {
                               borderRadius: BorderRadius.circular(13),
                               border: Border.all(color: Colors.black54)
                             ),
-                            child: Text('Запросы'),
+                            child: Text('Покупатель'),
                           )
                         )
                       ],
                     )
                   ),
                   Expanded(
-                    child: ([null].contains(spinkit)) ? __getFavorites(data) : spinkit
+                    child: ([null].contains(spinkit)) ? __getProfiles(data) : spinkit
                   ),
                   SizedBox(height: 20),
                 ],
@@ -138,27 +138,42 @@ class _FavoritePageState extends State<FavoritePage> {
     );
   }
 
-  __getFavorites(data)
+  __getProfiles(data)
   {
     return (data == null)
     ? Center()
     : RefreshIndicator(
-      onRefresh: () => __updateFavoriteItems(),
+      onRefresh: () => __updateProfiles(),
       child: ListView.builder(
         itemCount: data.length,
         itemBuilder: (BuildContext context, int i){
+
+          var status;
+
+          switch (data[i]['status']) {
+            case 'active':
+              status = 'Подтверждён';
+              break;
+            case 'waiting':
+              status = 'Ожидает подтверждения';
+              break;
+            default:
+              status = 'Не подтверждён';
+              break;
+          }
+
           return Column(
             children: <Widget>[
               Divider(),
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
                   InkWell(
                     onTap: () => {
                       Navigator.push(context, AnimatedScaleRoute(
-                        builder: (context) => ProductPage(
-                            productId: data[i]['id'],
+                        builder: (context) => ProfilePage(
+                            profileId: data[i]['id'],
                             auth: widget.auth,
                           )
                         )
@@ -169,37 +184,48 @@ class _FavoritePageState extends State<FavoritePage> {
                       width: 80,
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(13),
-                        image: DecorationImage(image: CachedNetworkImageProvider(data[i]['preview_image'], headers: {'Host': 'g2r-market.mobile'}), fit: BoxFit.fill)
+                        image: DecorationImage(image: CachedNetworkImageProvider(data[i]['company_logo_image'], headers: {'Host': 'g2r-market.mobile'}), fit: BoxFit.fill)
                       ),
+                      child: Align(
+                        alignment: Alignment.bottomRight,
+                        child: Container(
+                          height: 20,
+                          width: 20,
+                          decoration: BoxDecoration(
+                            color:Colors.white,
+                            image: DecorationImage(image: AssetImage('icons/flags/png/${data[i]['localisation'].toString().toLowerCase()}.png', package: 'country_icons'), fit: BoxFit.fill),
+                            borderRadius: BorderRadius.circular(13)
+                          ),
+                        ),
+                      )
                     ),
                   ),
-                  Column(
-                    children: <Widget>[
-                      Container(
-                        width: 200,
-                        child: Text(data[i]['name'], style: TextStyle(fontSize: 12), overflow: TextOverflow.clip, maxLines: 2)
-                      ),
-                      SizedBox(height: 20),
-                      Container(
-                        width: 200,
-                        child: Text('${data[i]['price_min']}\$ - ${data[i]['price_max']}\$', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold), overflow: TextOverflow.clip, maxLines: 2,)
-                      ),
-                    ],
-                  ),                
-                  Container(
-                    height: 40,
-                    width: 40,
-                    decoration: BoxDecoration(
-                      color:Colors.white,
-                      borderRadius: BorderRadius.circular(13)
+                  Padding(
+                    padding: EdgeInsets.only(left: 16),
+                    child: Column(
+                      children: <Widget>[
+                        Container(
+                          width: 200,
+                          child: Text(data[i]['company_name'], style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold), overflow: TextOverflow.clip, maxLines: 2)
+                        ),
+                        Container(
+                          width: 200,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: <Widget>[
+                              Text('Статус: ', style: TextStyle(color: Colors.black54),),
+                              Text(status)
+                            ],
+                          ),
+                        ),
+                        SizedBox(height: 20),
+                        Container(
+                          width: 200,
+                          child: Text(data[i]['company_description'], style: TextStyle(fontSize: 12), overflow: TextOverflow.ellipsis, maxLines: 2,)
+                        ),
+                      ],
                     ),
-                    child: InkWell(
-                      onTap: () => __updateFavorite(data[i], data),
-                      child: Padding(
-                        padding: EdgeInsets.all(10),
-                        child: (true) ? SvgPicture.asset('resources/svg/catalog/favorite-colored-active.svg') : SvgPicture.asset('resources/svg/catalog/favorite-colored.svg')
-                      ),
-                    )
                   ),
                 ],
               ),
@@ -211,25 +237,7 @@ class _FavoritePageState extends State<FavoritePage> {
     );
   }
 
-  Future __updateFavorite(product, data) async
-  {
-    var auth = await DBProvider.db.getAuth();
-
-    if(auth != Null)
-    {
-      
-      await Favorite.removeProduct(await auth, product['id']);
-
-      data.removeWhere((item) => item['id'] == product['id']);
-
-      setState((){
-        _data = data;
-        _loaded = true;
-      });
-    }
-  }
-
-  Future __getFavoritesInfo() async
+  Future __getProfilesList() async
   {
     var auth = await DBProvider.db.getAuth();
     
@@ -238,12 +246,12 @@ class _FavoritePageState extends State<FavoritePage> {
       return 'NOT_AUTHORIZED';
     }
 
-    var userInfo = await Favorite.getProducts(auth);
+    var profiles = await Profile.getProfiles(auth, 'seller');
 
-    return userInfo;
+    return profiles;
   }
 
-  __updateFavoriteItems()
+  __updateProfiles()
   {
     setState(() {
       _loaded = false;

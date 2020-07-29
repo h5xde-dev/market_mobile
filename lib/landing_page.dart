@@ -4,6 +4,7 @@ import 'package:g2r_market/pages/cabinet/favorites.dart';
 import 'package:g2r_market/pages/cabinet/settings.dart';
 import 'package:g2r_market/pages/home.dart';
 import 'package:flutter/services.dart';
+import 'package:quick_actions/quick_actions.dart';
 
 // ignore: must_be_immutable
 class LandingPage extends StatefulWidget {
@@ -33,6 +34,29 @@ class _LandingPageState extends State<LandingPage> {
     pageList.add(HomePage());
     pageList.add(SettingsPage(fromMain: true));
     super.initState();
+
+    final QuickActions quickActions = QuickActions();
+    quickActions.initialize((String shortcutType) {
+      setState(() {
+
+      });
+    });
+
+    quickActions.setShortcutItems(<ShortcutItem>[
+      // NOTE: This first action icon will only work on iOS.
+      // In a real world project keep the same file name for both platforms.
+      const ShortcutItem(
+        type: 'action_one',
+        localizedTitle: 'Настройки',
+        icon: 'AppIcon',
+      ),
+      // NOTE: This second action icon will only work on Android.
+      // In a real world project keep the same file name for both platforms.
+      const ShortcutItem(
+          type: 'action_two',
+          localizedTitle: 'Избранное',
+          icon: 'ic_launcher'),
+    ]);
   }
   
   @override

@@ -38,6 +38,7 @@ dependencies:
   webview_flutter:
   path_provider:
   path:
+  quick_actions:
   flutter:
     sdk: flutter
 

@@ -5,6 +5,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:g2r_market/helpers/navigator.dart';
 import 'package:g2r_market/pages/auth/sign_in_page.dart';
 import 'package:g2r_market/pages/cabinet/account_edit.dart';
+import 'package:g2r_market/pages/cabinet/profile/list.dart';
 import 'package:g2r_market/widgets/cabinet_button.dart';
 import 'package:g2r_market/helpers/db.dart';
 import 'package:g2r_market/landing_page.dart';
@@ -165,7 +166,14 @@ class SettingsPage extends StatelessWidget {
           icon: SvgPicture.asset('resources/svg/main/users.svg'),
           color: Colors.white,
           width: 300,
-          onPressed: (){},
+          onPressed: () async {
+            var auth = await DBProvider.db.getAuth();
+
+            Navigator.push(context, AnimatedSizeRoute(
+                builder: (context) => ProfileListPage(auth: auth)
+              )
+            );
+          },
         ),
         CabinetButton(
           text: Text('Сообщения'),
