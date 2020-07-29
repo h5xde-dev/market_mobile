@@ -1,16 +1,24 @@
-# g2r_market
+# G2R Market Mobile
 
-A new Flutter project.
+Мобильное приложение маркета
 
-## Getting Started
+## Что уже есть в приложении:
 
-This project is a starting point for a Flutter application.
+- [x] Авторизация и регистрация
+- [x] Просмотр каталога товаров
+- [ ] Просмотр каталога запросов
+- [x] Добавление в избранное и просмотр содержимого
+- [x] Просмотр личных данных и возможность их редактирования
+- [x] Список профилей
+- [ ] Выбор профиля и его редактирование
+- [ ] Создание профиля и его подтверждение
+- [ ] Просмотр магазинов поставщиков
+- [ ] Создание и редактирование товаров/запросов
+- [ ] Чат
 
-A few resources to get you started if this is your first Flutter project:
+## Что нужно знать перед сборкой
 
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
-
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+ - Для IOS:
+    - Сделать flutter build
+    - Затем в /ios/Podfile прописать строку: <br>
+    `target 'Runner' do use_frameworks!`
