@@ -122,12 +122,27 @@ class Profile {
             companyLogo = '$API_URL/storage/${item['downloads']['company_logo_image'][0]['path']}';
           }
         }
+
+        var localisation;
+
+        switch (item['profile_properties']['company_name']['localisation_id']) {
+          case 1:
+            localisation = 'ru';
+            break;
+          case 2:
+            localisation = 'en';
+            break;
+          default:
+            localisation = 'zh';
+            break;
+        }
         
         profile = {
           'id': item['id'],
           'company_logo': companyLogo,
           'company_promo': companyPromoImages,
-          'main_banner': companyMainBannerImages
+          'main_banner': companyMainBannerImages,
+          'localisation': localisation
         };
 
         for (var property in item['profile_properties'].values)
