@@ -33,6 +33,7 @@ class Settings {
         }
 
           var userMap = {
+              'userId': data['id'],
               'name': data['name'],
               'avatar': avatar,
           };

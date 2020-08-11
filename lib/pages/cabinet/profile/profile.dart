@@ -5,6 +5,7 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:flutter/material.dart';
 import 'package:g2r_market/helpers/db.dart';
+import 'package:g2r_market/helpers/profile.dart';
 import 'package:g2r_market/services/profile.dart';
 import 'package:g2r_market/widgets/bottom_navbar.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -280,12 +281,25 @@ class _ProfilePageState extends State<ProfilePage> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
-                CustomRaisedButton(
-                  borderRaius: 0,
-                  color: Colors.deepPurple[700],
-                  child: Text('Выбрать', style: TextStyle(color: Colors.white),),
-                  onPressed: (){},
-                ),
+                (data['active'] == true)
+                ? CustomRaisedButton(
+                    borderRaius: 0,
+                    color: Colors.deepPurple[700],
+                    child: Text('Выбран', style: TextStyle(color: Colors.white)),
+                  )
+                : CustomRaisedButton(
+                    borderRaius: 0,
+                    color: Colors.deepPurple[700],
+                    child: Text('Выбрать', style: TextStyle(color: Colors.white),),
+                    onPressed: () async {
+
+                      await ProfileHelper.select(data['id']);
+
+                      setState(() {
+                        
+                      });
+                    },
+                  ),
                 CustomRaisedButton(
                   borderRaius: 0,
                   color: Colors.deepPurple[700],
@@ -308,6 +322,8 @@ class _ProfilePageState extends State<ProfilePage> {
 
   Future __getContent() async
   {
+    int activeProfile = await ProfileHelper.getSelectedProfile();
+
     var auth = await DBProvider.db.getAuth();
     
     if(auth == Null)
@@ -315,7 +331,9 @@ class _ProfilePageState extends State<ProfilePage> {
       return null;
     }
 
-    var data = await Profile.getProfileInfo(auth, widget.profileId);
+    Map data = await Profile.getProfileInfo(auth, widget.profileId);
+
+    data.addAll({'active': (activeProfile != data['id']) ? false : true});
 
     return data;
   }

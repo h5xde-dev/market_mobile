@@ -29,10 +29,12 @@ class _LandingPageState extends State<LandingPage> {
     SystemChrome.setPreferredOrientations([
         DeviceOrientation.portraitUp,
     ]);
+    
     pageList.add(HomePage());
     pageList.add(FavoritePage(fromMain: true));
     pageList.add(HomePage());
     pageList.add(SettingsPage(fromMain: true));
+
     super.initState();
 
     final QuickActions quickActions = QuickActions();
@@ -61,6 +63,7 @@ class _LandingPageState extends State<LandingPage> {
   
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
       body: IndexedStack(
         index: widget.selectedPage,

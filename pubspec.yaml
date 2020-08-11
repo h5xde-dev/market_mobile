@@ -36,6 +36,8 @@ dependencies:
   country_icons:
   carousel_slider:
   webview_flutter:
+  shared_preferences:
+  flutter_local_notifications:
   path_provider:
   path:
   quick_actions:

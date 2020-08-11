@@ -32,6 +32,7 @@ class DBProvider {
 
       await db.execute("CREATE TABLE Account ("
           "id INTEGER PRIMARY KEY,"
+          "user_id INTEGER,"
           "name TEXT,"
           "last_name TEXT,"
           "patronymic TEXT,"
@@ -62,7 +63,7 @@ class DBProvider {
     int id = table.first["id"] ?? 1;
     //insert to the table using the new id 
     var raw = await db.rawInsert(
-        "INSERT Into Account (id, name, last_name, patronymic, birthday, phone, avatar)"
+        "INSERT Into Account (user_id, name, last_name, patronymic, birthday, phone, avatar)"
         " VALUES (?, ?, ?, ?, ?, ?, ?)",
         [id, newClient.name, newClient.lastName, newClient.patronymic, newClient.birthday, newClient.phone, newClient.avatar]);
     return raw;
