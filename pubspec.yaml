@@ -38,6 +38,8 @@ dependencies:
   webview_flutter:
   shared_preferences:
   flutter_local_notifications:
+  permission_handler:
+  background_fetch:
   path_provider:
   path:
   quick_actions:

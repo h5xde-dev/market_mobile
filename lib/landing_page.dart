@@ -50,7 +50,7 @@ class _LandingPageState extends State<LandingPage> {
       const ShortcutItem(
         type: 'action_one',
         localizedTitle: 'Настройки',
-        icon: 'AppIcon',
+        icon: 'ic_launcher',
       ),
       // NOTE: This second action icon will only work on Android.
       // In a real world project keep the same file name for both platforms.

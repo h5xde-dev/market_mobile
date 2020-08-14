@@ -25,8 +25,6 @@ class Rabbitmq {
 
       String hash = "${base64.encode(utf8.encode(account['name']))}${base64.encode(utf8.encode(account['user_id'].toString()))}";
 
-      print(hash);
-
       Client client = new Client(
         settings: ConnectionSettings(
           host: '176.99.5.64',
@@ -63,7 +61,7 @@ class Rabbitmq {
     final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
 
     var androidPlatformChannelSpecifics = AndroidNotificationDetails(
-        'your channel id', 'your channel name', 'your channel description',
+        'com.example.g2r_market/chat', 'Уведомления чата', 'Настройка уведомлений для чатов',
         importance: Importance.Max, priority: Priority.High, ticker: 'ticker'
     );
 
@@ -71,7 +69,7 @@ class Rabbitmq {
 
     var platformChannelSpecifics = NotificationDetails(androidPlatformChannelSpecifics, iOSPlatformChannelSpecifics);
 
-    await flutterLocalNotificationsPlugin.show(
+    await flutterLocalNotificationsPlugin.show(   
         0, from, text, platformChannelSpecifics,
         payload: 'item x');
   }

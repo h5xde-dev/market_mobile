@@ -143,7 +143,7 @@ class _SignInPageState extends State<SignInPage> {
       {
         (widget.fromMain)
         ? Navigator.pushReplacement(context, MaterialPageRoute(
-            builder: (context) => LandingPage(selectedPage: 0)
+            builder: (context) => new LandingPage(selectedPage: 0)
           )
         )
         : Navigator.pop(context);

@@ -1,11 +1,19 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:g2r_market/helpers/notifications.dart';
 import 'package:g2r_market/landing_page.dart';
 import 'package:g2r_market/services/rabbitmq.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:rxdart/subjects.dart';
+
+import 'package:background_fetch/background_fetch.dart';
+
+Future<void> backgroundFetchHeadlessTask(String taskId) async {
+
+  await Rabbitmq.getDelivery();
+
+  BackgroundFetch.finish(taskId);
+}
 
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
 
@@ -16,13 +24,31 @@ final BehaviorSubject<String> selectNotificationSubject = BehaviorSubject<String
 
 NotificationAppLaunchDetails notificationAppLaunchDetails;
 
-
 void main() async {
 
   runApp(MyApp());
+
+  await initPlatformState();
   
-  await Rabbitmq.getDelivery();
 }
+
+Future<void> initPlatformState() async {
+  
+    BackgroundFetch.configure(BackgroundFetchConfig(
+        startOnBoot: true,
+        minimumFetchInterval: 15,
+        stopOnTerminate: false,
+        enableHeadless: true,
+        requiresBatteryNotLow: false,
+        requiresCharging: false,
+        requiresStorageNotLow: false,
+        requiresDeviceIdle: false,
+        requiredNetworkType: NetworkType.ANY
+    ), (String taskId) async {
+        await backgroundFetchHeadlessTask(taskId);
+      } 
+    );
+  }
 
 class MyApp extends StatefulWidget {
   @override
@@ -31,13 +57,15 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
 
-  final MethodChannel platform = MethodChannel('crossingthestreams.io/resourceResolver');
   @override
   void initState() {
     super.initState();
     _requestIOSPermissions();
     _configureDidReceiveLocalNotificationSubject();
     _configureSelectNotificationSubject();
+
+    BackgroundFetch.registerHeadlessTask(backgroundFetchHeadlessTask);
+    
   }
 
   void _requestIOSPermissions() {
