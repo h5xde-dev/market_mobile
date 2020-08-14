@@ -39,6 +39,7 @@ dependencies:
   shared_preferences:
   flutter_local_notifications:
   permission_handler:
+  country_code_picker:
   background_fetch:
   path_provider:
   path:

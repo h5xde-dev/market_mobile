@@ -6,10 +6,12 @@ import 'package:flutter/material.dart';
 import 'package:g2r_market/helpers/db.dart';
 import 'package:g2r_market/helpers/navigator.dart';
 import 'package:g2r_market/pages/auth/sign_in_page.dart';
+import 'package:g2r_market/pages/cabinet/profile/create_seller.dart';
 import 'package:g2r_market/pages/cabinet/profile/profile.dart';
 import 'package:g2r_market/services/profile.dart';
 import 'package:g2r_market/widgets/bottom_navbar.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:g2r_market/widgets/custom_raised_button.dart';
 
 class ProfileListPage extends StatefulWidget {
   
@@ -127,6 +129,16 @@ class _ProfileListPageState extends State<ProfileListPage> {
                   ),
                   Expanded(
                     child: ([null].contains(spinkit)) ? __getProfiles(data) : spinkit
+                  ),
+                  CustomRaisedButton(
+                    color: Colors.deepPurple[700],
+                    child: Text('Создать профиль'),
+                    onPressed: () => {
+                      Navigator.push(context, AnimatedSizeRoute(
+                          builder: (context) => SellerCreatePage(profiles: data)
+                        )
+                      )
+                    },
                   ),
                   SizedBox(height: 20),
                 ],

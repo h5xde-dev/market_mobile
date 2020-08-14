@@ -6,6 +6,7 @@ class CustomInput extends StatelessWidget {
   const CustomInput({
     this.placeholder: '',
     this.height: 50,
+    this.width: 0,
     this.controller,
     this.errorText,
     this.formatter,
@@ -16,6 +17,7 @@ class CustomInput extends StatelessWidget {
   final String placeholder;
   final String label;
   final double height;
+  final double width;
   final TextEditingController controller;
   final TextInputFormatter formatter;
   final TextInputType type;
@@ -28,6 +30,7 @@ class CustomInput extends StatelessWidget {
 
     return Container(
       height: height,
+      width: (width == 0) ? MediaQuery.of(context).size.width : width,
       child: TextFormField(
         controller: controller,
         obscureText: (type == TextInputType.visiblePassword),
