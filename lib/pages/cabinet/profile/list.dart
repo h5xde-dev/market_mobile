@@ -12,6 +12,7 @@ import 'package:g2r_market/services/profile.dart';
 import 'package:g2r_market/widgets/bottom_navbar.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:g2r_market/widgets/custom_raised_button.dart';
+import 'package:g2r_market/static/api_methods.dart';
 
 class ProfileListPage extends StatefulWidget {
   
@@ -196,7 +197,7 @@ class _ProfileListPageState extends State<ProfileListPage> {
                       width: 80,
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(13),
-                        image: DecorationImage(image: CachedNetworkImageProvider(data[i]['company_logo_image'], headers: {'Host': 'g2r-market.mobile'}), fit: BoxFit.fill)
+                        image: DecorationImage(image: CachedNetworkImageProvider(data[i]['company_logo_image'], headers: {'Host': API_HOST}), fit: BoxFit.fill)
                       ),
                       child: Align(
                         alignment: Alignment.bottomRight,

@@ -16,7 +16,7 @@ class Settings {
     final response = await http.Client().get(
       MarketApi.accountInfo,
       headers: {
-        'Host': 'g2r-market.mobile',
+        'Host': API_HOST,
         'Authorization': 'Bearer ${auth['token']}'
       },
     );
@@ -84,7 +84,7 @@ class Settings {
     );
 
     request.headers.addAll({
-      'Host': 'g2r-market.mobile',
+      'Host': API_HOST,
       'Authorization': 'Bearer ${auth['token']}'
     });
 

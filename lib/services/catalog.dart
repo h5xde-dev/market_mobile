@@ -17,11 +17,11 @@ class Catalog {
       MarketApi.getProducts + '?category=$category&page=$page',
       headers: (auth != Null)
       ? {
-          'Host': 'g2r-market.mobile',
+          'Host': API_HOST,
           'Authorization': 'Bearer ${auth['token']}'
         }
       : {
-          'Host': 'g2r-market.mobile',
+          'Host': API_HOST,
         }
     );
 
@@ -75,11 +75,11 @@ class Catalog {
       MarketApi.getProduct + '?id=$productId',
       headers: (auth != Null)
       ? {
-          'Host': 'g2r-market.mobile',
+          'Host': API_HOST,
           'Authorization': 'Bearer ${auth['token']}'
         }
       : {
-          'Host': 'g2r-market.mobile',
+          'Host': API_HOST,
         }
     );
 

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:g2r_market/helpers/navigator.dart';
 import 'dart:ui';
 import 'package:g2r_market/pages/products/catalog.dart';
+import 'package:g2r_market/static/api_methods.dart';
 
 class CategoryCard extends StatelessWidget {
 
@@ -28,7 +29,7 @@ class CategoryCard extends StatelessWidget {
         width: 100,
         decoration:  (image != null)
         ? BoxDecoration(
-            image: DecorationImage(image: CachedNetworkImageProvider(image, headers: {'Host': 'g2r-market.mobile'}), fit: BoxFit.cover),
+            image: DecorationImage(image: CachedNetworkImageProvider(image, headers: {'Host': API_HOST}), fit: BoxFit.cover),
             borderRadius: BorderRadius.circular(13),
           )
         : BoxDecoration(

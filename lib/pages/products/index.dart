@@ -10,6 +10,7 @@ import 'package:g2r_market/widgets/bottom_navbar.dart';
 import 'package:g2r_market/services/catalog.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:g2r_market/widgets/youtube_frame.dart';
+import 'package:g2r_market/static/api_methods.dart';
 
 // ignore: must_be_immutable
 class ProductPage extends StatefulWidget {
@@ -164,7 +165,7 @@ class _ProductPageState extends State<ProductPage> {
                     return Container(
                       width: MediaQuery.of(context).size.width,
                       margin: EdgeInsets.symmetric(horizontal: 5.0),
-                      child: CachedNetworkImage(imageUrl: i, httpHeaders: {'Host': 'g2r-market.mobile'}, fit: BoxFit.fill,),
+                      child: CachedNetworkImage(imageUrl: i, httpHeaders: {'Host': API_HOST}, fit: BoxFit.fill,),
                     );
                   },
                 );
@@ -335,7 +336,7 @@ class _ProductPageState extends State<ProductPage> {
             height: 70,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(13),
-              image: DecorationImage(image: CachedNetworkImageProvider(data[0]['preview_image'], headers: {'Host': 'g2r-market.mobile'}), fit: BoxFit.cover)
+              image: DecorationImage(image: CachedNetworkImageProvider(data[0]['preview_image'], headers: {'Host': API_HOST}), fit: BoxFit.cover)
             ),
           ),
           onTap: () => setState((){
@@ -350,7 +351,7 @@ class _ProductPageState extends State<ProductPage> {
             height: 70,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(13),
-              image: DecorationImage(image: CachedNetworkImageProvider(data[0]['preview_image'], headers: {'Host': 'g2r-market.mobile'}), fit: BoxFit.cover)
+              image: DecorationImage(image: CachedNetworkImageProvider(data[0]['preview_image'], headers: {'Host': API_HOST}), fit: BoxFit.cover)
             ),
             child: Container(
               decoration: BoxDecoration(
@@ -368,7 +369,7 @@ class _ProductPageState extends State<ProductPage> {
             height: 70,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(13),
-              image: DecorationImage(image: CachedNetworkImageProvider(model['preview_image'], headers: {'Host': 'g2r-market.mobile'}), fit: BoxFit.cover)
+              image: DecorationImage(image: CachedNetworkImageProvider(model['preview_image'], headers: {'Host': API_HOST}), fit: BoxFit.cover)
             ),
           ),
           onTap: () => {
@@ -385,7 +386,7 @@ class _ProductPageState extends State<ProductPage> {
             height: 70,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(13),
-              image: DecorationImage(image: CachedNetworkImageProvider(model['preview_image'], headers: {'Host': 'g2r-market.mobile'}), fit: BoxFit.cover)
+              image: DecorationImage(image: CachedNetworkImageProvider(model['preview_image'], headers: {'Host': API_HOST}), fit: BoxFit.cover)
             ),
             child: Container(
               decoration: BoxDecoration(

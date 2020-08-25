@@ -11,6 +11,7 @@ import 'package:g2r_market/widgets/cabinet_button.dart';
 import 'package:g2r_market/helpers/db.dart';
 import 'package:g2r_market/landing_page.dart';
 import 'package:g2r_market/services/settings.dart';
+import 'package:g2r_market/static/api_methods.dart';
 
 class SettingsPage extends StatelessWidget {
 
@@ -98,7 +99,7 @@ class SettingsPage extends StatelessWidget {
                           child: (data['avatar'] != '') 
                           ? CircleAvatar(
                               radius: 40,
-                              backgroundImage: CachedNetworkImageProvider(data['avatar'], headers: {'Host': 'g2r-market.mobile'}),
+                              backgroundImage: CachedNetworkImageProvider(data['avatar'], headers: {'Host': API_HOST}),
                             )
                           : CircleAvatar(
                               radius: 40,

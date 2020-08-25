@@ -1,8 +1,8 @@
 const API_URL = 'http://176.99.5.64';
+const API_HOST = 'g2r-market.su';
 
-
-const CLIENT_ID = '910c3c97-998d-4c24-b3d5-1cbd25bd7c5c';
-const CLIENT_SECRET = 'zhu2KbmN8TPT2DEsJY2LIGhdVo2jTUGDSRtWHcvG';
+const CLIENT_ID = '915e2e84-6d36-44a1-8af5-2323d25643e6';
+const CLIENT_SECRET = 'THsXjDr9HwF5rc9vfI2wiIfC6q8GFXZgKjQoC6Yc';
 
 const REDIRECT_URL = 'http://localhost/';
 

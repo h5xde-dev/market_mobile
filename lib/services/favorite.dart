@@ -15,7 +15,7 @@ class Favorite {
     final response = await http.Client().get(
       MarketApi.favoriteProductGet,
       headers: {
-        'Host': 'g2r-market.mobile',
+        'Host': API_HOST,
         'Authorization': 'Bearer ${auth['token']}'
       },
     );
@@ -74,7 +74,7 @@ class Favorite {
     final response = await http.Client().get(
       '${MarketApi.favoriteProductAdd}?id=$id',
       headers: {
-        'Host': 'g2r-market.mobile',
+        'Host': API_HOST,
         'Authorization': 'Bearer ${auth['token']}'
       },
     );
@@ -95,7 +95,7 @@ class Favorite {
     final response = await http.Client().get(
       '${MarketApi.favoriteProductRemove}?id=$id',
       headers: {
-        'Host': 'g2r-market.mobile',
+        'Host': API_HOST,
         'Authorization': 'Bearer ${auth['token']}'
       },
     );

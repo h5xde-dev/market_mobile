@@ -16,7 +16,7 @@ class Category {
     final response = await http.Client().get(
       MarketApi.mainUrl,
       headers: {
-        'Host': 'g2r-market.mobile'
+        'Host': API_HOST
       }
     );
 
@@ -46,7 +46,7 @@ class Category {
     final response = await http.Client().get(
       MarketApi.fullCatalog,
       headers: {
-        'Host': 'g2r-market.mobile'
+        'Host': API_HOST
       }
     );
 

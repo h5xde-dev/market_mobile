@@ -16,6 +16,7 @@ import 'package:g2r_market/widgets/custom_input.dart';
 import 'package:g2r_market/widgets/custom_raised_button.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:g2r_market/static/api_methods.dart';
 
 // ignore: must_be_immutable
 class AccountEditPage extends StatefulWidget{
@@ -135,7 +136,7 @@ class _AccountEditPageState extends State<AccountEditPage> {
                                 child: (data.containsKey('avatar') != false && data['avatar'] != '' || avatar != null)
                                 ? CircleAvatar(
                                     radius: 40,
-                                    backgroundImage: (avatar == null) ? CachedNetworkImageProvider(data['avatar'] , headers: {'Host': 'g2r-market.mobile'}) : avatar,
+                                    backgroundImage: (avatar == null) ? CachedNetworkImageProvider(data['avatar'] , headers: {'Host': API_HOST}) : avatar,
                                     child: Icon(Icons.photo_camera),
                                   )
                                 : CircleAvatar(

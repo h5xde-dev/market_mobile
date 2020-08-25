@@ -7,6 +7,7 @@ import 'package:g2r_market/helpers/navigator.dart';
 import 'package:g2r_market/pages/auth/sign_in_page.dart';
 import 'package:g2r_market/pages/products/index.dart';
 import 'package:g2r_market/services/favorite.dart';
+import 'package:g2r_market/static/api_methods.dart';
 
 // ignore: must_be_immutable
 class ProductCard extends StatefulWidget {
@@ -44,7 +45,7 @@ class _ProductCardState extends State<ProductCard> {
         width: 100,
         decoration:  (widget.image != null)
         ? BoxDecoration(
-            image: DecorationImage(image: CachedNetworkImageProvider(widget.image, headers: {'Host': 'g2r-market.mobile'}), fit: BoxFit.cover),
+            image: DecorationImage(image: CachedNetworkImageProvider(widget.image, headers: {'Host': API_HOST}), fit: BoxFit.cover),
             borderRadius: BorderRadius.circular(13),
           )
         : BoxDecoration(

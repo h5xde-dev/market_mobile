@@ -17,7 +17,7 @@ class Auth {
     final response = await http.Client().post(
       MarketApi.authUrl,
       headers: {
-        'Host': 'g2r-market.mobile'
+        'Host': API_HOST
       },
       body: {
         'grant_type': 'password',
@@ -54,7 +54,7 @@ class Auth {
     final response = await http.Client().post(
       MarketApi.registerUrl,
       headers: {
-        'Host': 'g2r-market.mobile'
+        'Host': API_HOST
       },
       body: {
         'email': email,

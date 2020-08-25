@@ -13,7 +13,7 @@ class Profile {
     final response = await http.Client().get(
       (type == 'buyer') ? MarketApi.getBuyers : MarketApi.getSellers,
       headers: {
-        'Host': 'g2r-market.mobile',
+        'Host': API_HOST,
         'Authorization': 'Bearer ${auth['token']}'
       },
     );
@@ -78,7 +78,7 @@ class Profile {
       MarketApi.getProfileInfo + '/$profileId',
       headers: 
       {
-        'Host': 'g2r-market.mobile',
+        'Host': API_HOST,
         'Authorization': 'Bearer ${auth['token']}'
       }
     );

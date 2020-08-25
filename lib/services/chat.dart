@@ -22,7 +22,7 @@ class Chat {
     final response = await http.Client().get(
       url,
       headers: {
-        'Host': 'g2r-market.mobile',
+        'Host': API_HOST,
         'Authorization': 'Bearer ${auth['token']}'
       },
     );
@@ -47,7 +47,7 @@ class Chat {
     final response = await http.Client().get(
       "$url$chatId?page=$page",
       headers: {
-        'Host': 'g2r-market.mobile',
+        'Host': API_HOST,
         'Authorization': 'Bearer ${auth['token']}'
       },
     );
@@ -74,7 +74,7 @@ class Chat {
     final response = await http.Client().post(
       "$url$chatId",
       headers: {
-        'Host': 'g2r-market.mobile',
+        'Host': API_HOST,
         'Authorization': 'Bearer ${auth['token']}'
       },
       body: {

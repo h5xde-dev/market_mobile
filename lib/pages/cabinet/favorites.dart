@@ -10,6 +10,7 @@ import 'package:g2r_market/pages/products/index.dart';
 import 'package:g2r_market/services/favorite.dart';
 import 'package:g2r_market/widgets/bottom_navbar.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:g2r_market/static/api_methods.dart';
 
 class FavoritePage extends StatefulWidget {
   
@@ -169,7 +170,7 @@ class _FavoritePageState extends State<FavoritePage> {
                       width: 80,
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(13),
-                        image: DecorationImage(image: CachedNetworkImageProvider(data[i]['preview_image'], headers: {'Host': 'g2r-market.mobile'}), fit: BoxFit.fill)
+                        image: DecorationImage(image: CachedNetworkImageProvider(data[i]['preview_image'], headers: {'Host': API_HOST}), fit: BoxFit.fill)
                       ),
                     ),
                   ),
