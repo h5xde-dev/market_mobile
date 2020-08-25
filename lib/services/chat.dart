@@ -52,7 +52,30 @@ class Chat {
       },
     );
 
-    print("$url$chatId?page=$page");
+    if(response.statusCode == 200)
+    {
+      List data = jsonDecode(response.body);
+
+      result = data.reversed.toList();
+    }
+
+    return result;
+  }
+
+  static Future<List> getMessages(auth, int chatId, int profileId, int page) async
+  {
+
+    List result = [];
+
+    String url = MarketApi.getMessages;
+
+    final response = await http.Client().get(
+      "$url$chatId?profile=$profileId&page=$page",
+      headers: {
+        'Host': API_HOST,
+        'Authorization': 'Bearer ${auth['token']}'
+      },
+    );
 
     if(response.statusCode == 200)
     {
@@ -73,6 +96,32 @@ class Chat {
 
     final response = await http.Client().post(
       "$url$chatId",
+      headers: {
+        'Host': API_HOST,
+        'Authorization': 'Bearer ${auth['token']}'
+      },
+      body: {
+        'message_text': message
+      }
+    );
+
+    if(response.statusCode == 200)
+    {
+      result = true;
+    }
+
+    return result;
+  }
+
+  static Future<bool> sendProfile(auth, int chatId, int profileId, int toProfile, String message) async
+  {
+
+    bool result = false;
+
+    String url = MarketApi.sendProfile;
+
+    final response = await http.Client().post(
+      "$url$chatId?profile=$profileId&to_profile=$toProfile",
       headers: {
         'Host': API_HOST,
         'Authorization': 'Bearer ${auth['token']}'

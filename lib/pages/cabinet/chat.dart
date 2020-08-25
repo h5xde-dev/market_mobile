@@ -1,8 +1,8 @@
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:g2r_market/helpers/db.dart';
+import 'package:g2r_market/helpers/profile.dart';
 import 'package:g2r_market/services/chat.dart';
-import 'package:g2r_market/services/settings.dart';
 import 'package:g2r_market/widgets/flat_chat/action_button.dart';
 import 'package:g2r_market/widgets/flat_chat/chat_message.dart';
 import 'package:g2r_market/widgets/flat_chat/message_input.dart';
@@ -43,27 +43,35 @@ class _ChatPageState extends State<ChatPage> {
     _firebaseMessaging.configure(
       onMessage: (Map<String, dynamic> message) async {
 
-        var userInfo = await DBProvider.db.getAccountInfo();
+        bool isMine = false;
 
-        bool isMine = (message['data']['from_id'].toString() == userInfo['user_id'].toString());
-
-        if(message['data']['type'] == 'user' )
+        if(message['data']['type'] == 'user')
         {
-          _data.insert(0, FlatChatMessage(
-            message: message['notification']['body'],
-            messageType: (isMine) ? MessageType.sent : MessageType.received,
-            showTime: true,
-            time: message['data']['created_at'],
-          ));
-
-          setState(() {
-            _page = _page;
-            _data = _data;
-            _loaded = true;
-          });  
+          var userInfo = await DBProvider.db.getAccountInfo();
+          isMine = (message['data']['from_id'].toString() == userInfo['user_id'].toString());
         }
 
-      },
+        if(message['data']['type'] == 'profile')
+        {
+          var currentProfile = await ProfileHelper.getSelectedProfile();
+
+          isMine = (message['data']['from_id'].toString() == currentProfile.toString());
+        }
+
+        _data.insert(0, FlatChatMessage(
+          message: message['notification']['body'],
+          messageType: (isMine) ? MessageType.sent : MessageType.received,
+          showTime: true,
+          time: message['data']['created_at'],
+        ));
+
+        setState(() {
+          _page = _page;
+          _data = _data;
+          _loaded = true;
+        });
+
+      }
     );
   }
 
@@ -138,9 +146,12 @@ class _ChatPageState extends State<ChatPage> {
           roundedCorners: true,
           textController: textController,
           onSubmitted: () async {
-            await Chat.sendSupport(widget.auth, widget.chat['id'], textController.text);
 
             textController.text = null;
+
+            (widget.chat['type'] == 'support')
+            ? await Chat.sendSupport(widget.auth, widget.chat['id'], textController.text)
+            : await sendProfile(textController.text);
 
             setState(() {
               _page = _page;
@@ -151,6 +162,30 @@ class _ChatPageState extends State<ChatPage> {
         ),
       ),
     );
+  }
+
+  Future sendProfile(String message) async
+  {
+    var profileId = await ProfileHelper.getSelectedProfile();
+
+    if(profileId != Null)
+    {
+      await Chat.sendProfile(widget.auth, widget.chat['id'], profileId, widget.chat['profile_id'], message);
+
+    } else
+    {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(13)
+            ),
+            title: Text('Не выбран профиль для этого диалога'),
+          );
+        },
+      );
+    }
   }
 
   Future<List> __getContent() async
@@ -175,6 +210,44 @@ class _ChatPageState extends State<ChatPage> {
             showTime: true,
             time: message['created_at'],
           )
+        );
+      }
+    }
+
+    if(widget.chat['type'] == 'profile')
+    {
+      _page = _page + 1;
+
+      var profileId = await ProfileHelper.getSelectedProfile();
+
+      if(profileId != Null)
+      {
+        List newData = await Chat.getMessages(widget.auth, widget.chat['id'], profileId, _page);
+
+        for (var message in newData)
+        {
+          _data.add(
+            FlatChatMessage(
+              message: message['message'],
+              messageType: message['mine'] ? MessageType.sent : MessageType.received,
+              showTime: true,
+              time: message['created_at'],
+            )
+          );
+        }
+
+      } else
+      {
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(13)
+              ),
+              title: Text('Не выбран профиль для этого диалога'),
+            );
+          },
         );
       }
     }

@@ -17,6 +17,7 @@ class MarketApi {
   static String getMessagesSupport = '$API_URL/api/mobile/chat/get/support/';
   static String getMessages = '$API_URL/api/mobile/chat/get/profile/';
   static String sendSupport = '$API_URL/api/mobile/chat/send/support/';
+  static String sendProfile = '$API_URL/api/mobile/chat/send/profile/';
 
   static String fullCatalog = '$API_URL/api/mobile/categories';
 

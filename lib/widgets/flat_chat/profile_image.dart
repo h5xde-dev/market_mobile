@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:g2r_market/static/api_methods.dart';
 
 class FlatProfileImage extends StatelessWidget {
 
@@ -174,6 +175,7 @@ class FlatIndicatorImage extends StatelessWidget {
           'resources/images/default_profile_image.png',
           fit: BoxFit.cover,
         ),
+        httpHeaders: {'Host': API_HOST},
         imageUrl: image
       );
     }
