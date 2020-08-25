@@ -17,6 +17,9 @@ import 'package:path_provider/path_provider.dart';
 
 // ignore: must_be_immutable
 class SellerCreatePage extends StatefulWidget{
+  
+
+  final double padding = 10;
 
   final profiles;  
   Map errors;
@@ -218,7 +221,7 @@ class _SellerCreatePageState extends State<SellerCreatePage> {
                           : SizedBox(width: 10),
                         ],
                       ),
-                      SizedBox(height: 10)
+                      SizedBox(height: widget.padding)
                     ],
                   ),
                 )
@@ -277,12 +280,12 @@ class _SellerCreatePageState extends State<SellerCreatePage> {
           fontSize: 20,
           fontWeight: FontWeight.bold
         )),
-        SizedBox(height: 10),
+        SizedBox(height: widget.padding),
         CustomInput(label: 'Название компании', controller: companyNameController, type: TextInputType.text, errorText: 
           (widget.errors != null && widget.errors.containsKey('company_name') == true)
           ? widget.errors['company_name']
           : null ),
-        SizedBox(height: 10),
+        SizedBox(height: widget.padding),
         CountryCodePicker(
           onChanged: (CountryCode item){
             print(item.code);
@@ -292,27 +295,27 @@ class _SellerCreatePageState extends State<SellerCreatePage> {
           showOnlyCountryWhenClosed: true,
           alignLeft: false,
         ),
-        SizedBox(height: 10),
+        SizedBox(height: widget.padding),
         CustomInput(label: 'Область/Штат/республика/край', controller: regionController, type: TextInputType.text, errorText: 
           (widget.errors != null && widget.errors.containsKey('region') == true)
           ? widget.errors['region']
           : null ),
-        SizedBox(height: 10),
+        SizedBox(height: widget.padding),
         CustomInput(label: 'Город', controller: cityController, type: TextInputType.text, errorText: 
           (widget.errors != null && widget.errors.containsKey('city') == true)
           ? widget.errors['city']
           : null ),
-        SizedBox(height: 10),
+        SizedBox(height: widget.padding),
         CustomInput(label: 'Индекс', controller: indexController, type: TextInputType.number, errorText: 
           (widget.errors != null && widget.errors.containsKey('index') == true)
           ? widget.errors['index']
           : null ),
-        SizedBox(height: 10),
+        SizedBox(height: widget.padding),
         CustomInput(label: 'Улица', controller: streetController, type: TextInputType.text, errorText: 
           (widget.errors != null && widget.errors.containsKey('street') == true)
           ? widget.errors['street']
           : null ),
-        SizedBox(height: 10),
+        SizedBox(height: widget.padding),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -332,42 +335,42 @@ class _SellerCreatePageState extends State<SellerCreatePage> {
               : null ),
           ],
         ),
-        SizedBox(height: 10),
+        SizedBox(height: widget.padding * 2),
         Text('Контактная информация', style: TextStyle(
           fontSize: 20,
           fontWeight: FontWeight.bold
         )),
-        SizedBox(height: 10),
+        SizedBox(height: widget.padding),
         CustomInput(label: 'Имя', controller: nameController, type: TextInputType.text, errorText: 
           (widget.errors != null && widget.errors.containsKey('name') == true)
           ? widget.errors['name']
           : null ),
-        SizedBox(height: 10),
+        SizedBox(height: widget.padding),
         CustomInput(label: 'Фамилия', controller: lastNameController, type: TextInputType.text, errorText: 
           (widget.errors != null && widget.errors.containsKey('last_name') == true)
           ? widget.errors['last_name']
           : null ),
-        SizedBox(height: 10),
+        SizedBox(height: widget.padding),
         CustomInput(label: 'Отчество', controller: patronymicController, type: TextInputType.text, errorText: 
           (widget.errors != null && widget.errors.containsKey('patronymic') == true)
           ? widget.errors['patronymic']
           : null ),
-        SizedBox(height: 10),
+        SizedBox(height: widget.padding),
         CustomInput(label: 'Телефон', controller: numberPhoneController, type: TextInputType.number, errorText: 
           (widget.errors != null && widget.errors.containsKey('number_phone') == true)
           ? widget.errors['number_phone']
           : null ),
-        SizedBox(height: 10),
+        SizedBox(height: widget.padding),
         CustomInput(label: 'Должность', controller: positionController, type: TextInputType.text, errorText: 
           (widget.errors != null && widget.errors.containsKey('position') == true)
           ? widget.errors['position']
           : null ),
-        SizedBox(height: 10),
+        SizedBox(height: widget.padding),
         CustomInput(label: 'Мобильный телефон', controller: numberPhoneMobileController, type: TextInputType.number, errorText: 
           (widget.errors != null && widget.errors.containsKey('number_phone_mobile') == true)
           ? widget.errors['number_phone_mobile']
           : null ),
-        SizedBox(height: 10),
+        SizedBox(height: widget.padding),
         Text('Главный баннер магазина: '),
         SizedBox(height: 5),
         Container(
@@ -381,7 +384,7 @@ class _SellerCreatePageState extends State<SellerCreatePage> {
             ]
           )
         ),
-        SizedBox(height: 10),
+        SizedBox(height: widget.padding),
         Text('Логотип компании: '),
         SizedBox(height: 5),
         Container(
@@ -390,12 +393,20 @@ class _SellerCreatePageState extends State<SellerCreatePage> {
               CustomRaisedButton(
                 color: Colors.white,
                 child: Icon(Icons.photo_album),
-                onPressed: (){}
+                onPressed: () async {
+                  File _avatar = await FilePicker.getFile(
+                    type: FileType.image,
+                  );
+
+                  setState((){
+                    avatar = FileImage(_avatar);
+                  });
+                }
               )
             ]
           )
         ),
-        SizedBox(height: 10),
+        SizedBox(height: widget.padding),
         Text('Изображения для рекламного баннера: '),
         SizedBox(height: 5),
         Container(
@@ -409,7 +420,7 @@ class _SellerCreatePageState extends State<SellerCreatePage> {
             ]
           )
         ),
-        SizedBox(height: 10),
+        SizedBox(height: widget.padding),
         Text('Фото для блока описание: '),
         SizedBox(height: 5),
         Container(
@@ -423,7 +434,7 @@ class _SellerCreatePageState extends State<SellerCreatePage> {
             ]
           )
         ),
-        SizedBox(height: 10),
+        SizedBox(height: widget.padding),
         Text('Другие фото компании: '),
         SizedBox(height: 5),
         Container(

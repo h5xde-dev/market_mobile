@@ -41,6 +41,7 @@ dependencies:
   permission_handler:
   country_code_picker:
   background_fetch:
+  firebase_messaging:
   path_provider:
   path:
   quick_actions:
@@ -81,6 +82,7 @@ flutter:
     - resources/svg/main/package.svg
     - resources/svg/catalog/favorite-colored.svg
     - resources/svg/catalog/favorite-colored-active.svg
+    - resources/images/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.

@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "598778680242",
+    "firebase_url": "https://markettest.firebaseio.com",
+    "project_id": "markettest",
+    "storage_bucket": "markettest.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:598778680242:android:710c2a58c662a733330aab",
+        "android_client_info": {
+          "package_name": "com.example.g2r_market"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "598778680242-0lqu8sf12102340n5h4g69r7ic02h41o.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBNsZlXcqjk_1eKkHy6I3ydt2sT_M-Cq90"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "598778680242-0lqu8sf12102340n5h4g69r7ic02h41o.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,5 +1,6 @@
 const API_URL = 'http://176.99.5.64';
 
+
 const CLIENT_ID = '910c3c97-998d-4c24-b3d5-1cbd25bd7c5c';
 const CLIENT_SECRET = 'zhu2KbmN8TPT2DEsJY2LIGhdVo2jTUGDSRtWHcvG';
 
@@ -11,6 +12,11 @@ class MarketApi {
   static String registerUrl = '$API_URL/api/mobile/register';
 
   static String mainUrl = '$API_URL/api/mobile/categories?type=popular';
+
+  static String getChats = '$API_URL/api/mobile/chat/get';
+  static String getMessagesSupport = '$API_URL/api/mobile/chat/get/support/';
+  static String getMessages = '$API_URL/api/mobile/chat/get/profile/';
+  static String sendSupport = '$API_URL/api/mobile/chat/send/support/';
 
   static String fullCatalog = '$API_URL/api/mobile/categories';
 
