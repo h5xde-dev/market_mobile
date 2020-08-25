@@ -1,14 +1,15 @@
 const API_URL = 'http://176.99.5.64';
 const API_HOST = 'g2r-market.su';
 
-const CLIENT_ID = '915e2e84-6d36-44a1-8af5-2323d25643e6';
-const CLIENT_SECRET = 'THsXjDr9HwF5rc9vfI2wiIfC6q8GFXZgKjQoC6Yc';
+const CLIENT_ID = '915e96a7-de4f-414c-a404-580abe714a6e';
+const CLIENT_SECRET = 'iXCp6DLI36MmEaGSxVjy32A5838W0TivQkODfCEi';
 
 const REDIRECT_URL = 'http://localhost/';
 
 class MarketApi {
 
   static String authUrl = '$API_URL/oauth/token';
+  static String saveDevice = '$API_URL/api/mobile/device/save';
   static String registerUrl = '$API_URL/api/mobile/register';
 
   static String mainUrl = '$API_URL/api/mobile/categories?type=popular';

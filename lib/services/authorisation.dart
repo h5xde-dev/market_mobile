@@ -1,4 +1,5 @@
 import 'dart:io' show Platform;
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:g2r_market/helpers/auth_base.dart';
 import 'package:g2r_market/helpers/db.dart';
 import 'package:g2r_market/static/api_methods.dart';
@@ -38,6 +39,8 @@ class Auth {
       });
 
       DBProvider.db.newAuth(auth);
+
+      await saveDevice(data['access_token']);
 
       result = true;
     }
@@ -82,5 +85,24 @@ class Auth {
 
     return errors;
 
+  }
+
+  static Future<void>saveDevice(String token) async
+  {
+    final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
+
+    String deviceId = await _firebaseMessaging.getToken();
+
+    await http.Client().post(
+      MarketApi.saveDevice,
+      headers: {
+        'Host': API_HOST,
+        'Authorization': 'Bearer $token'
+      },
+      body: {
+        'device_id': deviceId,
+        'type': 'firebase'
+      }
+    );
   }
 }
