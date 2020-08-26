@@ -6,10 +6,13 @@ class SignInButton extends CustomRaisedButton {
     @required String text,
     Color color,
     Color textColor,
+    bool isLoading: false,
     VoidCallback onPressed
   }) :  assert(text != null),
         super(
-          child: Text(
+          child: (isLoading == true) 
+          ? CircularProgressIndicator()
+          : Text(
             text, style:TextStyle(color: textColor, fontSize: 15.0)
           ),
           color:color,

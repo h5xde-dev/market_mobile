@@ -26,8 +26,10 @@ class SignInPage extends StatefulWidget {
 
 class _SignInPageState extends State<SignInPage> {
 
-  final emailController = TextEditingController();
-  final passwordController = TextEditingController();
+  bool loading = false;
+
+  TextEditingController emailController = TextEditingController();
+  TextEditingController passwordController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -80,9 +82,17 @@ class _SignInPageState extends State<SignInPage> {
                     SizedBox(height: 8.0),
                     SignInButton(
                       text: 'Войти',
+                      isLoading: (loading),
                       textColor: Colors.black,
                       color: Colors.white,
-                      onPressed: () => __authValidation(context),
+                      onPressed: () async 
+                      {
+                        setState(() {
+                          loading = true;
+                        });
+                        
+                        await __authValidation(context);
+                      }
                     ),
                     Divider(color: Colors.black),
                     SizedBox(height: 8.0),
@@ -113,7 +123,6 @@ class _SignInPageState extends State<SignInPage> {
 
   Future __authValidation(context) async
   {
-
     Map errors = {};
 
     if(passwordController.text.length < 8)
@@ -131,16 +140,16 @@ class _SignInPageState extends State<SignInPage> {
       errors.addEntries([MapEntry('email', 'E-mail указан неверно')]);
     }
 
-    setState(() {
-      widget.errors = errors;
-    });
-
     if(errors.length == 0)
     {
       bool result = await Auth.login(emailController.text, passwordController.text);
 
       if(result)
       {
+        setState(() {
+          loading = false;
+        });
+
         (widget.fromMain)
         ? Navigator.pushReplacement(context, MaterialPageRoute(
             builder: (context) => new LandingPage(selectedPage: 0)
@@ -161,6 +170,11 @@ class _SignInPageState extends State<SignInPage> {
             );
           },
         );
+
+        setState(() {
+          widget.errors = errors;
+          loading = false;
+        });
       }
     }
   }

@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:g2r_market/helpers/db.dart';
 import 'package:g2r_market/helpers/profile.dart';
 import 'package:g2r_market/services/profile.dart';
+import 'package:g2r_market/static/api_methods.dart';
 import 'package:g2r_market/widgets/bottom_navbar.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:g2r_market/widgets/custom_raised_button.dart';
@@ -125,7 +126,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
     List images = data['main_banner'];
     
-    if(data.containsKey('company_promo') != false)
+    if(data.containsKey('company_promo') != false && data['company_promo'] != null)
     {
       for(var image in data['company_promo'])
       {
@@ -171,7 +172,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     return new Container(
                       width: MediaQuery.of(context).size.width,
                       margin: EdgeInsets.symmetric(horizontal: 5.0),
-                      child: CachedNetworkImage(imageUrl: i, httpHeaders: {'Host': 'g2r-market.mobile'}, fit: BoxFit.fill,),
+                      child: CachedNetworkImage(imageUrl: i, httpHeaders: {'Host': API_HOST}, fit: BoxFit.fill,),
                     );
                   },
                 );
