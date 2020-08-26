@@ -5,10 +5,16 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_masked_text/flutter_masked_text.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:g2r_market/helpers/navigator.dart';
 import 'package:g2r_market/helpers/db.dart';
 import 'package:g2r_market/landing_page.dart';
+import 'package:g2r_market/pages/auth/sign_in_page.dart';
+import 'package:g2r_market/services/profile.dart';
 import 'package:g2r_market/services/settings.dart';
+import 'package:g2r_market/widgets/custom__file_picker.dart';
+import 'package:g2r_market/widgets/custom__multiple_file_picker.dart';
 import 'package:g2r_market/widgets/custom_input.dart';
 import 'package:g2r_market/widgets/custom_raised_button.dart';
 import 'package:country_code_picker/country_code_picker.dart';
@@ -56,18 +62,57 @@ class _SellerCreatePageState extends State<SellerCreatePage> {
   final TextEditingController companyDescriptionController = TextEditingController();
   final TextEditingController companyYoutubeLinkController = TextEditingController();
 
-  List<CameraDescription> cameras = [];
-  CameraController cameraController;
-  FileImage avatar;
+  File companyLogo;
+  List<FileImage> mainBanner = [];
+  List<FileImage> promoBanner = [];
+  File descriptionBanner;
+  List<FileImage> otherImages = [];
+
+
+  bool _loaded = false;
   Map userInfo;
+
+  Map allowedCountries = {
+    'RU': 'Русский',
+    'ZH': 'Китайский',
+    'EN': 'Английский'
+  };
       
   @override
   Widget build(BuildContext context) {
-    
-    return __content(context);
+
+    final spinkit = Center(
+      child: Stack(
+        alignment: Alignment.center,
+        children: <Widget>[
+          SpinKitRing(color: Colors.blue[900], size: 175),
+          SvgPicture.asset('resources/svg/main/spinner.svg', alignment: Alignment.center, width: 150),
+        ],
+      )
+    );
+
+    return (_loaded != false)
+    ? __content(context, allowedCountries, null)
+    : FutureBuilder(
+      future: __getProfilesList(),
+      builder: (BuildContext context, AsyncSnapshot snapshot){
+        switch (snapshot.connectionState) {
+          case ConnectionState.none:
+            return __content(context, null, spinkit);
+          case ConnectionState.waiting:
+            return __content(context, null, spinkit);
+          default:
+            if (snapshot.hasError || snapshot.data == 'NOT_AUTHORIZED')
+              return SignInPage(fromMain: false);
+            else {
+              return __content(context, snapshot.data, null);
+            }
+        }
+      },
+    );
   }
 
-  __content(context)
+  __content(context, data, spinkit)
   {
     Size size = MediaQuery.of(context).size;
 
@@ -81,182 +126,47 @@ class _SellerCreatePageState extends State<SellerCreatePage> {
     } */
 
     return Scaffold(
-      body: Visibility(
-        visible: (cameraController != null && cameraController.value.isInitialized == true) ? false : true,
-        child: Stack(
-          children: <Widget>[
-            Container(
-              height: size.height * .25,
-              decoration: BoxDecoration(
-                color: Color.fromRGBO(247,247,247, 100)
-              ),
+      body: Stack(
+        children: <Widget>[
+          Container(
+            height: size.height * .25,
+            decoration: BoxDecoration(
+              color: Color.fromRGBO(247,247,247, 100)
             ),
-            SafeArea(
-              child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: 20),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: <Widget>[
-                    SizedBox(height:20),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: <Widget>[
-                        InkWell(
-                          child: Icon(Icons.arrow_back_ios),
-                          onTap: () => Navigator.pop(context, true),
-                        ),
-                        InkWell(
-                          child: Text('Выход'),
-                          onTap: () => __logout(context),
-                        ), 
-                      ],
-                    ),
-                    SizedBox(height: 20),
-                    Expanded(
-                      child: ListView(
-                        children: [__accountEdit(context)]
-                      )
-                    )
-                  ],
-                ),
-              )
-            ),
-          ]
-        ),
-        replacement: (cameraController != null && cameraController.value.isInitialized == true) ? 
-          Stack(
-            alignment: Alignment.bottomCenter,
-            children: <Widget>[
-              Transform.scale(
-              scale: cameraController.value.aspectRatio / (MediaQuery.of(context).size.width / MediaQuery.of(context).size.height),
-              child: Center(
-                  child: AspectRatio(
-                    aspectRatio: cameraController.value.aspectRatio,
-                    child: CameraPreview(cameraController),
-                  ),
-                ),
-              ),
-              Container(
-                padding: EdgeInsets.all(8),
-                child: SafeArea(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start,
+          ),
+          SafeArea(
+            child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: 20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: <Widget>[
+                  SizedBox(height:20),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: <Widget>[
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          InkWell(
-                            child: Icon(Icons.arrow_back_ios, color: Colors.white),
-                            onTap: () => {
-                              cameraController.dispose(),
-
-                              setState((){
-                                cameras = cameras;
-                                cameraController = null;
-                              })
-                            }
-                          ),
-                        ]
-                      )
-                    ]
-                  )
-                )
-              ),
-              Container(
-                child: SafeArea(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: <Widget>[
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: <Widget>[
-                          CustomRaisedButton(
-                            child: Icon(Icons.filter),
-                            onPressed: () async {
-                              cameraController.dispose();
-
-                              File _avatar = await FilePicker.getFile(
-                                type: FileType.custom,
-                                allowedExtensions: ['jpg','png','jpeg']
-                              ); 
-
-                              setState((){
-                                cameras = cameras;
-                                avatar = FileImage(_avatar);
-                                cameraController = null;
-                              });
-                            }
-                          ),
-                          SizedBox(width: 10),
-                          CustomRaisedButton(
-                            child: Icon(Icons.photo_camera),
-                            onPressed: () async {
-
-                              String path = join(
-                                (await getTemporaryDirectory()).path,
-                                '${DateTime.now()}.png',
-                              );
-
-                              await cameraController.takePicture(path);
-
-                              cameraController.dispose();
-
-                              setState((){
-                                cameras = cameras;
-                                avatar = FileImage(File(path));
-                                cameraController = null;
-                              });
-                            }
-                          ),
-                          SizedBox(width: 10),
-                          (cameras[1] != null)
-                          ? CustomRaisedButton(
-                              child: Icon(Icons.switch_camera),
-                              onPressed: () => _toggleCameraLens()
-                            )
-                          : SizedBox(width: 10),
-                        ],
+                      InkWell(
+                        child: Icon(Icons.arrow_back_ios),
+                        onTap: () => Navigator.pop(context, true),
                       ),
-                      SizedBox(height: widget.padding)
+                      InkWell(
+                        child: Text('Выход'),
+                        onTap: () => __logout(context),
+                      ), 
                     ],
                   ),
-                )
-              )
-            ],
-          )
-        : Center(),
-      )
+                  SizedBox(height: 20),
+                  Expanded(
+                    child: (spinkit != null) ? spinkit : ListView(
+                      children: [__accountEdit(context)]
+                    )
+                  )
+                ],
+              ),
+            )
+          ),
+        ]
+      ),
     );
-  }
-
-  void _toggleCameraLens() async {
-    final lensDirection =  cameraController.description.lensDirection;
-    CameraDescription newDescription;
-    if(lensDirection == CameraLensDirection.front){
-        newDescription = cameras.firstWhere((description) => description.lensDirection == CameraLensDirection.back);
-    }
-    else{
-        newDescription = cameras.firstWhere((description) => description.lensDirection == CameraLensDirection.front);
-    }
-
-    if(newDescription != null){
-
-      CameraController _cameraController = CameraController(newDescription, ResolutionPreset.high);
-
-      await _cameraController.initialize();
-
-      setState(() {
-        cameras = cameras;
-        cameraController = _cameraController;
-      });
-    }
-    else{
-      print('Asked camera not available');
-    }
   }
 
   Future __logout(context) async
@@ -272,6 +182,19 @@ class _SellerCreatePageState extends State<SellerCreatePage> {
 
   Widget __accountEdit(context)
   {
+
+    List<DropdownMenuItem> countries = [];
+
+    for(var country in allowedCountries.entries)
+    {
+      countries.add(
+        DropdownMenuItem(
+          child: Text('${country.value}'),
+          value: country.key.toString().toLowerCase()
+        ),
+      );
+    }
+    
     return Column(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -280,6 +203,15 @@ class _SellerCreatePageState extends State<SellerCreatePage> {
           fontSize: 20,
           fontWeight: FontWeight.bold
         )),
+        SizedBox(height: widget.padding),
+        DropdownButton(
+          hint: SizedBox(width: MediaQuery.of(context).size.width - 64, child:Text('Язык профиля')),
+          items: countries,
+          onChanged: (item)
+          {
+            print(item);
+          }
+        ),
         SizedBox(height: widget.padding),
         CustomInput(label: 'Название компании', controller: companyNameController, type: TextInputType.text, errorText: 
           (widget.errors != null && widget.errors.containsKey('company_name') == true)
@@ -371,83 +303,142 @@ class _SellerCreatePageState extends State<SellerCreatePage> {
           ? widget.errors['number_phone_mobile']
           : null ),
         SizedBox(height: widget.padding),
-        Text('Главный баннер магазина: '),
         SizedBox(height: 5),
-        Container(
-          child: Column(
-            children: <Widget>[
-              CustomRaisedButton(
-                color: Colors.white,
-                child: Icon(Icons.photo_album),
-                onPressed: (){}
-              )
-            ]
-          )
-        ),
-        SizedBox(height: widget.padding),
-        Text('Логотип компании: '),
-        SizedBox(height: 5),
-        Container(
-          child: Column(
-            children: <Widget>[
-              CustomRaisedButton(
-                color: Colors.white,
-                child: Icon(Icons.photo_album),
-                onPressed: () async {
-                  File _avatar = await FilePicker.getFile(
-                    type: FileType.image,
-                  );
+        CustomMultipleFilePicker(
+          choosenImages: mainBanner,
+          text: "Баннер компании",
+          onPressed: () async {
 
-                  setState((){
-                    avatar = FileImage(_avatar);
-                  });
-                }
-              )
-            ]
-          )
+            List<FileImage> _mainBanner = [];
+
+            List<File> _images = await FilePicker.getMultiFile(
+              type: FileType.image,
+              allowCompression: true
+            );
+
+            if( _images.isNotEmpty)
+            {
+              for (var _banner in _images)
+              {
+                _mainBanner.add(FileImage(_banner));
+              }
+
+              setState((){
+                mainBanner = _mainBanner;
+              });
+            }
+          },
+          afterRemove: () {
+            setState((){
+              mainBanner = mainBanner;
+            });
+          }
         ),
         SizedBox(height: widget.padding),
-        Text('Изображения для рекламного баннера: '),
         SizedBox(height: 5),
-        Container(
-          child: Column(
-            children: <Widget>[
-              CustomRaisedButton(
-                color: Colors.white,
-                child: Icon(Icons.photo_album),
-                onPressed: (){}
-              )
-            ]
-          )
+        CustomFilePicker(
+          text: "Логотип компании",
+          choosenImage: companyLogo,
+          onPressed: () async {
+            companyLogo = await FilePicker.getFile(
+              type: FileType.image,
+              allowCompression: true
+            );
+
+            setState(() {
+              companyLogo = companyLogo;
+            });
+          },
+          afterRemove: (){
+            setState(() {
+              companyLogo = null;
+            });
+          },
         ),
         SizedBox(height: widget.padding),
-        Text('Фото для блока описание: '),
-        SizedBox(height: 5),
-        Container(
-          child: Column(
-            children: <Widget>[
-              CustomRaisedButton(
-                color: Colors.white,
-                child: Icon(Icons.photo_album),
-                onPressed: (){}
-              )
-            ]
-          )
+        CustomMultipleFilePicker(
+          choosenImages: promoBanner,
+          text: "Изображения для рекламного баннера",
+          onPressed: () async {
+
+            List<FileImage> _promoBanner = [];
+
+            List<File> _images = await FilePicker.getMultiFile(
+              type: FileType.image,
+              allowCompression: true
+            );
+
+            if( _images.isNotEmpty)
+            {
+              for (var _banner in _images)
+              {
+                _promoBanner.add(FileImage(_banner));
+              }
+
+              setState((){
+                promoBanner = _promoBanner;
+              });
+            }
+          },
+          afterRemove: () {
+            setState((){
+              promoBanner = promoBanner;
+            });
+          }
         ),
         SizedBox(height: widget.padding),
-        Text('Другие фото компании: '),
-        SizedBox(height: 5),
-        Container(
-          child: Column(
-            children: <Widget>[
-              CustomRaisedButton(
-                color: Colors.white,
-                child: Icon(Icons.photo_album),
-                onPressed: (){}
-              )
-            ]
-          )
+        CustomFilePicker(
+          text: "Фото для блока описание",
+          choosenImage: companyLogo,
+          onPressed: () async {
+            companyLogo = await FilePicker.getFile(
+              type: FileType.image,
+              allowCompression: true
+            );
+
+            setState(() {
+              companyLogo = companyLogo;
+            });
+          },
+          afterRemove: (){
+            setState(() {
+              companyLogo = null;
+            });
+          },
         ),
+        SizedBox(height: widget.padding),
+        SizedBox(height: 5),
+        CustomMultipleFilePicker(
+          choosenImages: otherImages,
+          text: "Другие фото компании",
+          onPressed: () async {
+
+            List<FileImage> _otherImages = [];
+
+            List<File> _images = await FilePicker.getMultiFile(
+              type: FileType.image,
+              allowCompression: true
+            );
+
+            if( _images.isNotEmpty)
+            {
+              for (var _banner in _images)
+              {
+                _otherImages.add(FileImage(_banner));
+              }
+
+              setState((){
+                otherImages = _otherImages;
+              });
+            }
+          },
+          afterRemove: () {
+            setState((){
+              otherImages = otherImages;
+            });
+          }
+        ),
+        SizedBox(height: widget.padding),
         Center(
           child: CustomRaisedButton(
             //onPressed: () => __saveData(data),
@@ -457,6 +448,30 @@ class _SellerCreatePageState extends State<SellerCreatePage> {
         )
       ]
     );
+  }
+
+  Future __getProfilesList() async
+  {
+    var auth = await DBProvider.db.getAuth();
+    
+    if(auth == Null)
+    {
+      return 'NOT_AUTHORIZED';
+    }
+
+    var profiles = await Profile.getProfiles(auth, 'seller');
+
+    for (var profile in profiles)
+    {
+      allowedCountries.remove(profile['localisation'].toString().toUpperCase());
+    }
+
+    setState(() {
+      allowedCountries = allowedCountries;
+      _loaded = true;
+    });
+
+    return allowedCountries;
   }
 
   /* Future __saveData(data) async
