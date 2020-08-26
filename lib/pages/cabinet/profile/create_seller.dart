@@ -11,6 +11,7 @@ import 'package:g2r_market/helpers/navigator.dart';
 import 'package:g2r_market/helpers/db.dart';
 import 'package:g2r_market/landing_page.dart';
 import 'package:g2r_market/pages/auth/sign_in_page.dart';
+import 'package:g2r_market/pages/cabinet/profile/list.dart';
 import 'package:g2r_market/services/profile.dart';
 import 'package:g2r_market/services/settings.dart';
 import 'package:g2r_market/widgets/custom__file_picker.dart';
@@ -61,6 +62,9 @@ class _SellerCreatePageState extends State<SellerCreatePage> {
 
   final TextEditingController companyDescriptionController = TextEditingController();
   final TextEditingController companyYoutubeLinkController = TextEditingController();
+
+  String countryCompany;
+  String languageCompany;
 
   File companyLogo;
   List<FileImage> mainBanner = [];
@@ -115,15 +119,6 @@ class _SellerCreatePageState extends State<SellerCreatePage> {
   __content(context, data, spinkit)
   {
     Size size = MediaQuery.of(context).size;
-
-    /* if(data != null)
-    {
-      nameController.text = data['name'];
-      lastNameController.text = data['last_name'];
-      patronymicController.text = data['patronymic'];
-      birthdayController.text = data['birthday'];
-      phoneController.text = data['phone'];
-    } */
 
     return Scaffold(
       body: Stack(
@@ -209,7 +204,9 @@ class _SellerCreatePageState extends State<SellerCreatePage> {
           items: countries,
           onChanged: (item)
           {
-            print(item);
+            setState(() {
+              languageCompany = item.toString();
+            });
           }
         ),
         SizedBox(height: widget.padding),
@@ -220,7 +217,9 @@ class _SellerCreatePageState extends State<SellerCreatePage> {
         SizedBox(height: widget.padding),
         CountryCodePicker(
           onChanged: (CountryCode item){
-            print(item.code);
+            setState(() {
+              countryCompany = item.code.toLowerCase();
+            });
           },
           initialSelection: 'RU',
           showCountryOnly: true,
@@ -439,9 +438,19 @@ class _SellerCreatePageState extends State<SellerCreatePage> {
           }
         ),
         SizedBox(height: widget.padding),
+        CustomInput(height: 200, label: 'Описание компании', controller: companyDescriptionController, type: TextInputType.text, errorText: 
+          (widget.errors != null && widget.errors.containsKey('company_description') == true)
+          ? widget.errors['company_description']
+          : null ),
+        SizedBox(height: widget.padding),
+        CustomInput(label: 'Ссылка на ролик в ютубе', controller: companyYoutubeLinkController, type: TextInputType.number, errorText: 
+          (widget.errors != null && widget.errors.containsKey('company_youtube_link') == true)
+          ? widget.errors['company_youtube_link']
+          : null ),
+        SizedBox(height: widget.padding),
         Center(
           child: CustomRaisedButton(
-            //onPressed: () => __saveData(data),
+            onPressed: () async => await createProfile(context),
             color: Colors.white,
             child: Text('Сохранить'),
           )
@@ -474,7 +483,7 @@ class _SellerCreatePageState extends State<SellerCreatePage> {
     return allowedCountries;
   }
 
-  /* Future __saveData(data) async
+  Future createProfile(context) async
   {
     Map errors = {};
 
@@ -485,36 +494,177 @@ class _SellerCreatePageState extends State<SellerCreatePage> {
       return null;
     }
 
+    if(companyNameController.text.length == 0)
+    {
+      errors.addEntries([MapEntry('company_name', 'Название компании не должно быть пустым')]);
+    }
+
+    if(regionController.text.length == 0)
+    {
+      errors.addEntries([MapEntry('region', 'Регион не должен быть пустым')]);
+    }
+
+    if(cityController.text.length == 0)
+    {
+      errors.addEntries([MapEntry('city', 'Город не должнен быть пустым')]);
+    }
+
     if(nameController.text.length == 0)
     {
       errors.addEntries([MapEntry('name', 'Имя не должно быть пустым')]);
     }
 
-    if(errors.length == 0)
+    if(lastNameController.text.length == 0)
     {
-      var result = await Settings.changeAccountInfo(
-        auth,
-        (nameController.text == null) ?  data['name'] : nameController.text,
-        (lastNameController.text == null) ? data['last_name'] : lastNameController.text,
-        (patronymicController.text == null) ? data['patronymic'] : patronymicController.text,
-        (birthdayController.text == null) ? data['birthday'] : birthdayController.text,
-        (phoneController.text == null) ? data['phone'] : phoneController.text,
-        (avatar == null) ? data['avatar'] : avatar.file
+      errors.addEntries([MapEntry('last_name', 'Имя не должно быть пустым')]);
+    }
+
+    if(languageCompany == null)
+    {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(13)
+            ),
+            title: Text('Не выбран язык профиля'),
+          );
+        },
       );
 
-      setState(() {
-        _loaded = false;
-      });
+      return false;
+    }
 
-      if(result == false)
+    if(countryCompany == null)
+    {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(13)
+            ),
+            title: Text('Не выбрана страна профиля'),
+          );
+        },
+      );
+
+      return false;
+    }
+
+    if(mainBanner.isEmpty)
+    {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(13)
+            ),
+            title: Text('Не выбраны изображения для обложки магазина'),
+          );
+        },
+      );
+
+      return false;
+    }
+
+    if(companyLogo == null)
+    {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(13)
+            ),
+            title: Text('Не выбран логотип изображения'),
+          );
+        },
+      );
+
+      return false;
+    }
+
+    if(errors.length == 0)
+    {
+      Map _data;
+      Map _files;
+
+      _data.addEntries([
+        MapEntry('company_name', companyNameController.text),
+        MapEntry('region', regionController.text),
+        MapEntry('city', cityController.text),
+        MapEntry('index', indexController.text),
+        MapEntry('street', streetController.text),
+        MapEntry('number_home', numberHomeController.text),
+        MapEntry('number_build', numberBuildController.text),
+        MapEntry('number_room', numberRoomController.text),
+        MapEntry('phone', phoneController.text),
+        MapEntry('name', nameController.text),
+        MapEntry('last_name', lastNameController.text),
+        MapEntry('patronymic', patronymicController.text),
+        MapEntry('position', positionController.text),
+        MapEntry('number_phone', numberPhoneController.text),
+        MapEntry('number_phone_mobile', numberPhoneMobileController.text),
+        MapEntry('company_description', companyDescriptionController.text),
+        MapEntry('company_youtube_link', companyYoutubeLinkController.text),
+        MapEntry('profile_type', 'seller'),
+      ]);
+
+      _files.addEntries([
+        MapEntry('company_main_banner_images', []),
+        MapEntry('company_logo_image', companyLogo.path)
+      ]);
+
+      if(descriptionBanner != null)
       {
-        //return null;
+        _files.addEntries([MapEntry('company_description_image', descriptionBanner.path)]);
+      }      
+
+      if(otherImages.isNotEmpty)
+      {
+        _files.addEntries([MapEntry('company_other_images', [])]);
+
+        for (var item in otherImages)
+        {
+          _files['company_other_images'].add(item.file.path);
+        }
       }
+
+      if(promoBanner.isNotEmpty)
+      {
+        _files.addEntries([MapEntry('company_promo_banner_images', [])]);
+
+        for (var item in promoBanner)
+        {
+          _files['company_promo_banner_images'].add(item.file.path);
+        }
+      }
+
+      for (var item in mainBanner)
+      {
+        _files['company_main_banner_images'].add(item.file.path);
+      }
+
+      var result = await Profile.create(auth, _data, _files);
+
+      if(result == true)
+      {
+        Navigator.pushReplacement(context, AnimatedScaleRoute(
+          builder: (context) => ProfileListPage(
+              auth: auth,
+            )
+          )
+        );
+      }
+
     } else
     {
       setState(() {
         widget.errors = errors;
       });
     }
-  } */
+  }
 }

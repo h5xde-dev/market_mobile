@@ -159,4 +159,51 @@ class Profile {
     return profile;
 
   }
+
+  static Future<bool> create(auth, Map<String, String> data, Map files) async
+  {
+    bool result = false;
+
+    final request = http.MultipartRequest(
+      "POST",
+      Uri.parse(MarketApi.createSeller),
+    );
+
+    request.headers.addAll({
+      'Host': API_HOST,
+      'Authorization': 'Bearer ${auth['token']}'
+    });
+
+    request.fields.addEntries(data.entries);
+
+    for (var file in files.entries)
+    {
+      if(file.value is String)
+      {
+        request.files.add(await http.MultipartFile.fromPath(
+          file.key,
+          file.value
+        ));
+      }
+
+      if(file.value is List)
+      {
+        for (var fileMultiple in file.value) {
+          request.files.add(await http.MultipartFile.fromPath(
+            fileMultiple.entries.key,
+            fileMultiple.entries.value
+          )); 
+        }
+      }
+    }
+
+    var response = await request.send();
+
+    if (response.statusCode == 200) 
+    {
+      result = true;
+    }
+
+    return result;
+  }
 }
