@@ -20,8 +20,6 @@ import 'package:g2r_market/static/api_methods.dart';
 
 // ignore: must_be_immutable
 class AccountEditPage extends StatefulWidget{
-  
-  Map errors;
 
   AccountEditPage({
     Key key
@@ -39,6 +37,8 @@ class _AccountEditPageState extends State<AccountEditPage> {
   final TextEditingController birthdayController = MaskedTextController(mask: '00.00.0000');
   final TextEditingController phoneController = MaskedTextController(mask: '00000000000');
 
+  final _formKey = GlobalKey<FormState>();
+
   List<CameraDescription> cameras = [];
   CameraController cameraController;
   FileImage avatar;
@@ -47,8 +47,6 @@ class _AccountEditPageState extends State<AccountEditPage> {
       
   @override
   Widget build(BuildContext context) {
-
-    print(avatar);
 
     final spinkit = Center(
       child: Stack(
@@ -84,15 +82,6 @@ class _AccountEditPageState extends State<AccountEditPage> {
   __content(context, data, spinkit)
   {
     Size size = MediaQuery.of(context).size;
-
-    /* if(data != null)
-    {
-      nameController.text = data['name'];
-      lastNameController.text = data['last_name'];
-      patronymicController.text = data['patronymic'];
-      birthdayController.text = data['birthday'];
-      phoneController.text = data['phone'];
-    } */
 
     return Scaffold(
       body: Visibility(
@@ -191,7 +180,12 @@ class _AccountEditPageState extends State<AccountEditPage> {
                     [null].contains(spinkit)
                     ? Expanded(
                       child: ListView(
-                        children: [__accountEdit(context, data)]
+                        children: [
+                          Form(
+                            key: _formKey,
+                            child: __accountEdit(context, data)
+                          )
+                        ]
                       )
                     )
                     : Center(),
@@ -362,30 +356,60 @@ class _AccountEditPageState extends State<AccountEditPage> {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        CustomInput(label: 'Имя', controller: nameController, placeholder: data['name'], type: TextInputType.text, errorText: 
-          (widget.errors != null && widget.errors.containsKey('name') == true)
-          ? widget.errors['name']
-          : null ),
+        CustomInput(
+          label: 'Имя',
+          controller: nameController,
+          placeholder: (data != null && data.containsKey('name')) ? data['name'] : nameController.text,
+          type: TextInputType.text,
+          validator: (value) {
+            if(value.isEmpty)
+            {
+              return 'Поле не заполнено';
+            }
+
+            return null;
+          },
+        ),
         SizedBox(height: 10),
-        CustomInput(label: 'Фамилия', controller: lastNameController, placeholder: data['last_name'], type: TextInputType.text, errorText: 
-          (widget.errors != null && widget.errors.containsKey('last_name') == true)
-          ? widget.errors['last_name']
-          : null ),
+        CustomInput(
+          label: 'Фамилия',
+          controller: lastNameController,
+          placeholder: (data != null && data.containsKey('last_name')) ? data['last_name'] : lastNameController.text,
+          type: TextInputType.text,
+          validator: (value) {
+            return null;
+          },
+        ),
         SizedBox(height: 10),
-        CustomInput(label: 'Отчество', controller: patronymicController, placeholder: data['patronymic'], type: TextInputType.text, errorText: 
-          (widget.errors != null && widget.errors.containsKey('patronymic') == true)
-          ? widget.errors['patronymic']
-          : null ),
+        CustomInput(
+          label: 'Отчество',
+          controller: patronymicController,
+          placeholder: (data != null && data.containsKey('patronymic')) ? data['patronymic'] : patronymicController.text,
+          type: TextInputType.text,
+          validator: (value) {
+            return null;
+          },
+        ),
         SizedBox(height: 10),
-        CustomInput(label: 'День рождения', controller: birthdayController, placeholder: data['birthday'], type: TextInputType.number, errorText: 
-          (widget.errors != null && widget.errors.containsKey('birthday') == true)
-          ? widget.errors['birthday']
-          : null ),
+        CustomInput(
+          label: 'День рождения',
+          controller: birthdayController,
+          placeholder: (data != null && data.containsKey('birthday')) ? data['birthday'] : birthdayController.text,
+          type: TextInputType.number,
+          validator: (value) {
+            return null;
+          },
+        ),
         SizedBox(height: 10),
-        CustomInput(label: 'Телефон', controller: phoneController, placeholder: data['phone'], type: TextInputType.phone, errorText: 
-          (widget.errors != null && widget.errors.containsKey('phone') == true)
-          ? widget.errors['phone']
-          : null ),
+        CustomInput(
+          label: 'Телефон',
+          controller: phoneController,
+          placeholder: (data != null && data.containsKey('phone')) ? data['phone'] : phoneController.text,
+          type: TextInputType.phone,
+          validator: (value) {
+            return null;
+          }
+        ),
         SizedBox(height: 10),
         /* Row(
           mainAxisAlignment: MainAxisAlignment.start,
@@ -407,8 +431,6 @@ class _AccountEditPageState extends State<AccountEditPage> {
 
   Future __saveData(data) async
   {
-    Map errors = {};
-
     var auth = await DBProvider.db.getAuth();
     
     if(auth == Null)
@@ -416,12 +438,7 @@ class _AccountEditPageState extends State<AccountEditPage> {
       return null;
     }
 
-    if(nameController.text.length == 0)
-    {
-      errors.addEntries([MapEntry('name', 'Имя не должно быть пустым')]);
-    }
-
-    if(errors.length == 0)
+    if(_formKey.currentState.validate())
     {
       var result = await Settings.changeAccountInfo(
         auth,
@@ -441,11 +458,6 @@ class _AccountEditPageState extends State<AccountEditPage> {
       {
         //return null;
       }
-    } else
-    {
-      setState(() {
-        widget.errors = errors;
-      });
     }
   }
 

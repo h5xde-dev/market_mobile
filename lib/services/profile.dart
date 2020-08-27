@@ -1,8 +1,12 @@
 import 'dart:convert';
 import 'package:g2r_market/static/api_methods.dart';
 import 'package:http/http.dart' as http;
+import 'package:dio/dio.dart' as dio;
+import 'package:http_parser/http_parser.dart';
 import 'dart:async';
 import 'dart:core';
+
+import 'package:path/path.dart';
 
 class Profile {
 
@@ -164,42 +168,54 @@ class Profile {
   {
     bool result = false;
 
-    final request = http.MultipartRequest(
-      "POST",
-      Uri.parse(MarketApi.createSeller),
-    );
+    var dioRequest = dio.Dio();
+    dioRequest.options.baseUrl = API_URL;
 
-    request.headers.addAll({
+    dioRequest.options.headers = {
       'Host': API_HOST,
-      'Authorization': 'Bearer ${auth['token']}'
-    });
+      'Authorization': 'Bearer ${auth['token']}',
+      'Content-Type': 'application/x-www-form-urlencoded'
+    };
 
-    request.fields.addEntries(data.entries);
+    dio.FormData formData = new dio.FormData.fromMap(data);
 
     for (var file in files.entries)
     {
       if(file.value is String)
       {
-        request.files.add(await http.MultipartFile.fromPath(
-          file.key,
-          file.value
-        ));
+        var formFile = await dio.MultipartFile.fromFile(file.value,
+          filename: basename(file.value),
+          contentType: MediaType("image", extension(file.value)));
+
+        formData.files.add(MapEntry(file.key, formFile));
       }
 
       if(file.value is List)
       {
+        int index = 0;
+
         for (var fileMultiple in file.value) {
-          request.files.add(await http.MultipartFile.fromPath(
-            fileMultiple.entries.key,
-            fileMultiple.entries.value
-          )); 
+          var formFile = await dio.MultipartFile.fromFile(fileMultiple,
+            filename: basename(fileMultiple),
+            contentType: MediaType("image", extension(fileMultiple)));
+
+            String fileKey = "${file.key}[$index]";
+
+            index = index+1;
+
+          formData.files.add(MapEntry(fileKey, formFile));
         }
       }
     }
 
-    var response = await request.send();
+    
 
-    if (response.statusCode == 200) 
+    var response = await dioRequest.post(
+      "/api/mobile/create/profile",
+      data: formData,
+    );
+
+    if(response.statusCode == 200)
     {
       result = true;
     }

@@ -33,9 +33,10 @@ dependencies:
   file_picker:
   sqflite:
   dart_amqp:
+  dio:
+  http_parser:
   country_icons:
   carousel_slider:
-  webview_flutter:
   shared_preferences:
   flutter_local_notifications:
   permission_handler:

@@ -206,7 +206,7 @@ class _ProfileListPageState extends State<ProfileListPage> {
                           width: 20,
                           decoration: BoxDecoration(
                             color:Colors.white,
-                            image: DecorationImage(image: AssetImage('icons/flags/png/${data[i]['localisation'].toString().toLowerCase()}.png', package: 'country_icons'), fit: BoxFit.fill),
+                            image: DecorationImage(image: AssetImage('icons/flags/png/${(data[i]['localisation'].toString().toLowerCase() != 'zh') ? data[i]['localisation'].toString().toLowerCase() : 'cn'}.png', package: 'country_icons'), fit: BoxFit.fill),
                             borderRadius: BorderRadius.circular(13)
                           ),
                         ),

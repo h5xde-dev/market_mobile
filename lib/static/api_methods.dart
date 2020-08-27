@@ -20,7 +20,7 @@ class MarketApi {
   static String sendSupport = '$API_URL/api/mobile/chat/send/support/';
   static String sendProfile = '$API_URL/api/mobile/chat/send/profile/';
 
-  static String createSeller = '$API_URL/api/mobile/profile/create/new';
+  static String createSeller = '$API_URL/api/mobile/create/profile';
 
   static String fullCatalog = '$API_URL/api/mobile/categories';
 

@@ -12,6 +12,7 @@ class CustomInput extends StatelessWidget {
     this.formatter,
     this.label,
     this.type,
+    this.validator
   });
 
   final String placeholder;
@@ -22,6 +23,7 @@ class CustomInput extends StatelessWidget {
   final TextInputFormatter formatter;
   final TextInputType type;
   final String errorText;
+  final Function validator;
 
   @override
   Widget build(BuildContext context) {
@@ -42,6 +44,7 @@ class CustomInput extends StatelessWidget {
         autofocus: false,
         style: TextStyle(fontSize: 15.0, color: Colors.black),
         keyboardType: type,
+        validator: validator,
         decoration: InputDecoration(
           errorText: errorText,
           hintText: placeholder,

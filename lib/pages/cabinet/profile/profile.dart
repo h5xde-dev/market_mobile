@@ -203,7 +203,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     padding: EdgeInsets.all(8),
                     child: Row(
                       children: <Widget>[
-                        Image.asset('icons/flags/png/${data['country']['type'].toString().toLowerCase()}.png', package: 'country_icons'),
+                        Image.asset('icons/flags/png/${(data['country']['type'].toString().toLowerCase() != 'zh') ? data['country']['type'].toString().toLowerCase() : 'cn'}.png', package: 'country_icons'),
                         SizedBox(width: 10),
                         Text(data['country']['value'], style: TextStyle(fontSize: 12)),
                       ],

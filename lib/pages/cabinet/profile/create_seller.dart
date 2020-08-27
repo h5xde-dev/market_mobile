@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:camera/camera.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_masked_text/flutter_masked_text.dart';
@@ -13,23 +12,18 @@ import 'package:g2r_market/landing_page.dart';
 import 'package:g2r_market/pages/auth/sign_in_page.dart';
 import 'package:g2r_market/pages/cabinet/profile/list.dart';
 import 'package:g2r_market/services/profile.dart';
-import 'package:g2r_market/services/settings.dart';
 import 'package:g2r_market/widgets/custom__file_picker.dart';
 import 'package:g2r_market/widgets/custom__multiple_file_picker.dart';
 import 'package:g2r_market/widgets/custom_input.dart';
 import 'package:g2r_market/widgets/custom_raised_button.dart';
 import 'package:country_code_picker/country_code_picker.dart';
-import 'package:path/path.dart';
-import 'package:path_provider/path_provider.dart';
 
 // ignore: must_be_immutable
 class SellerCreatePage extends StatefulWidget{
   
 
   final double padding = 10;
-
-  final profiles;  
-  Map errors;
+  final profiles;
 
   SellerCreatePage({
     this.profiles,
@@ -42,6 +36,8 @@ class SellerCreatePage extends StatefulWidget{
 
 class _SellerCreatePageState extends State<SellerCreatePage> {
 
+  final _formKey = GlobalKey<FormState>();
+
   final TextEditingController companyNameController = TextEditingController();
   final TextEditingController regionController = TextEditingController();
   final TextEditingController cityController = TextEditingController();
@@ -50,7 +46,6 @@ class _SellerCreatePageState extends State<SellerCreatePage> {
   final TextEditingController numberHomeController = TextEditingController();
   final TextEditingController numberBuildController = TextEditingController();
   final TextEditingController numberRoomController = TextEditingController();
-  final TextEditingController phoneController = TextEditingController();
 
   final TextEditingController nameController = TextEditingController();
   final TextEditingController lastNameController = TextEditingController();
@@ -59,7 +54,6 @@ class _SellerCreatePageState extends State<SellerCreatePage> {
   final TextEditingController numberPhoneController = MaskedTextController(mask: '00000000000');
   final TextEditingController numberPhoneMobileController = MaskedTextController(mask: '00000000000');
   
-
   final TextEditingController companyDescriptionController = TextEditingController();
   final TextEditingController companyYoutubeLinkController = TextEditingController();
 
@@ -81,6 +75,8 @@ class _SellerCreatePageState extends State<SellerCreatePage> {
     'ZH': 'Китайский',
     'EN': 'Английский'
   };
+
+  String selectedCountryHint;
       
   @override
   Widget build(BuildContext context) {
@@ -152,7 +148,12 @@ class _SellerCreatePageState extends State<SellerCreatePage> {
                   SizedBox(height: 20),
                   Expanded(
                     child: (spinkit != null) ? spinkit : ListView(
-                      children: [__accountEdit(context)]
+                      children: [
+                        Form(
+                          key: _formKey,
+                          child: __accountEdit(context),
+                        )
+                      ]
                     )
                   )
                 ],
@@ -185,7 +186,7 @@ class _SellerCreatePageState extends State<SellerCreatePage> {
       countries.add(
         DropdownMenuItem(
           child: Text('${country.value}'),
-          value: country.key.toString().toLowerCase()
+          value: country
         ),
       );
     }
@@ -200,20 +201,34 @@ class _SellerCreatePageState extends State<SellerCreatePage> {
         )),
         SizedBox(height: widget.padding),
         DropdownButton(
-          hint: SizedBox(width: MediaQuery.of(context).size.width - 64, child:Text('Язык профиля')),
+          hint: SizedBox(
+            width: MediaQuery.of(context).size.width - 64,
+            child: Text((selectedCountryHint == null) ? 'Язык профиля' : selectedCountryHint)
+          ),
           items: countries,
           onChanged: (item)
           {
             setState(() {
-              languageCompany = item.toString();
+              languageCompany = item.key.toString();
+              selectedCountryHint = item.value.toString();
             });
           }
         ),
         SizedBox(height: widget.padding),
-        CustomInput(label: 'Название компании', controller: companyNameController, type: TextInputType.text, errorText: 
-          (widget.errors != null && widget.errors.containsKey('company_name') == true)
-          ? widget.errors['company_name']
-          : null ),
+        CustomInput(
+          label: 'Название компании',
+          placeholder: companyNameController.text,
+          controller: companyNameController,
+          type: TextInputType.text,
+          validator: (value) {
+            if(value.isEmpty)
+            {
+              return 'Поле не заполнено';
+            }
+
+            return null;
+          },  
+        ),
         SizedBox(height: widget.padding),
         CountryCodePicker(
           onChanged: (CountryCode item){
@@ -227,43 +242,91 @@ class _SellerCreatePageState extends State<SellerCreatePage> {
           alignLeft: false,
         ),
         SizedBox(height: widget.padding),
-        CustomInput(label: 'Область/Штат/республика/край', controller: regionController, type: TextInputType.text, errorText: 
-          (widget.errors != null && widget.errors.containsKey('region') == true)
-          ? widget.errors['region']
-          : null ),
+        CustomInput(
+          label: 'Область/Штат/республика/край',
+          controller: regionController,
+          placeholder: regionController.text,
+          type: TextInputType.text,
+          validator: (value) {
+            if(value.isEmpty)
+            {
+              return 'Поле не заполнено';
+            }
+
+            return null;
+          },
+        ),
         SizedBox(height: widget.padding),
-        CustomInput(label: 'Город', controller: cityController, type: TextInputType.text, errorText: 
-          (widget.errors != null && widget.errors.containsKey('city') == true)
-          ? widget.errors['city']
-          : null ),
+        CustomInput(
+          label: 'Город',
+          placeholder: cityController.text,
+          controller: cityController,
+          type: TextInputType.text,
+          validator: (value) {
+            if(value.isEmpty)
+            {
+              return 'Поле не заполнено';
+            }
+
+            return null;
+          },
+        ),
         SizedBox(height: widget.padding),
-        CustomInput(label: 'Индекс', controller: indexController, type: TextInputType.number, errorText: 
-          (widget.errors != null && widget.errors.containsKey('index') == true)
-          ? widget.errors['index']
-          : null ),
+        CustomInput(
+          label: 'Индекс',
+          placeholder: indexController.text,
+          controller: indexController,
+          type: TextInputType.number,
+          validator: (value) {
+            return null;
+          }
+        ),
         SizedBox(height: widget.padding),
-        CustomInput(label: 'Улица', controller: streetController, type: TextInputType.text, errorText: 
-          (widget.errors != null && widget.errors.containsKey('street') == true)
-          ? widget.errors['street']
-          : null ),
+        CustomInput(
+          label: 'Улица',
+          controller: streetController,
+          placeholder: streetController.text,
+          type: TextInputType.text,
+          validator: (value) {
+            return null;
+          }, 
+        ),
         SizedBox(height: widget.padding),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            CustomInput(label: 'Дом', width: 100, controller: numberHomeController, type: TextInputType.number, errorText: 
-              (widget.errors != null && widget.errors.containsKey('number_home') == true)
-              ? widget.errors['number_home']
-              : null ),
+            CustomInput(
+              label: 'Дом',
+              width: 100,
+              placeholder: numberHomeController.text,
+              controller: numberHomeController,
+              type: TextInputType.number,
+              validator: (value) {
+                return null;
+              }
+            ),
             SizedBox(width: 10),
-            CustomInput(label: 'Корпус', width: 100, controller: numberBuildController, type: TextInputType.number, errorText: 
-              (widget.errors != null && widget.errors.containsKey('number_build') == true)
-              ? widget.errors['number_build']
-              : null ),
+            CustomInput(
+              label: 'Корпус',
+              width: 100,
+              placeholder: numberBuildController.text,
+              controller: numberBuildController,
+              type: TextInputType.number,
+              validator: (value) {
+                return null;
+              }
+            ),
             SizedBox(width: 10),
-            CustomInput(label: 'Помещение', width: 120, controller: numberRoomController, type: TextInputType.number, errorText: 
-              (widget.errors != null && widget.errors.containsKey('number_room') == true)
-              ? widget.errors['number_room']
-              : null ),
+            CustomInput(
+              label: 'Помещение',
+              placeholder: numberRoomController.text,
+              width: 120,
+              controller: numberRoomController,
+              type: TextInputType.number,
+              validator: (value) {
+                return null;
+              }
+            ),
           ],
         ),
         SizedBox(height: widget.padding * 2),
@@ -272,35 +335,85 @@ class _SellerCreatePageState extends State<SellerCreatePage> {
           fontWeight: FontWeight.bold
         )),
         SizedBox(height: widget.padding),
-        CustomInput(label: 'Имя', controller: nameController, type: TextInputType.text, errorText: 
-          (widget.errors != null && widget.errors.containsKey('name') == true)
-          ? widget.errors['name']
-          : null ),
+        CustomInput(
+          label: 'Имя',
+          placeholder: nameController.text,
+          controller: nameController,
+          type: TextInputType.text,
+          validator: (value) {
+            if(value.isEmpty)
+            {
+              return 'Поле не заполнено';
+            }
+
+            return null;
+          }, 
+        ),
         SizedBox(height: widget.padding),
-        CustomInput(label: 'Фамилия', controller: lastNameController, type: TextInputType.text, errorText: 
-          (widget.errors != null && widget.errors.containsKey('last_name') == true)
-          ? widget.errors['last_name']
-          : null ),
+        CustomInput(
+          label: 'Фамилия',
+          placeholder: lastNameController.text,
+          controller: lastNameController,
+          type: TextInputType.text,
+          validator: (value) {
+            if(value.isEmpty)
+            {
+              return 'Поле не заполнено';
+            }
+
+            return null;
+          },
+        ),
         SizedBox(height: widget.padding),
-        CustomInput(label: 'Отчество', controller: patronymicController, type: TextInputType.text, errorText: 
-          (widget.errors != null && widget.errors.containsKey('patronymic') == true)
-          ? widget.errors['patronymic']
-          : null ),
+        CustomInput(
+          label: 'Отчество',
+          placeholder: patronymicController.text,
+          controller: patronymicController,
+          type: TextInputType.text,
+          validator: (value) {
+            return null;
+          }, 
+        ),
         SizedBox(height: widget.padding),
-        CustomInput(label: 'Телефон', controller: numberPhoneController, type: TextInputType.number, errorText: 
-          (widget.errors != null && widget.errors.containsKey('number_phone') == true)
-          ? widget.errors['number_phone']
-          : null ),
+        CustomInput(
+          label: 'Телефон',
+          placeholder: numberPhoneController.text,
+          controller: numberPhoneController,
+          type: TextInputType.number,
+          validator: (value) {
+            if(value.isEmpty)
+            {
+              return 'Поле не заполнено';
+            }
+
+            return null;
+          },
+        ),
         SizedBox(height: widget.padding),
-        CustomInput(label: 'Должность', controller: positionController, type: TextInputType.text, errorText: 
-          (widget.errors != null && widget.errors.containsKey('position') == true)
-          ? widget.errors['position']
-          : null ),
+        CustomInput(
+          label: 'Должность',
+          placeholder: positionController.text,
+          controller: positionController,
+          type: TextInputType.text,
+          validator: (value) {
+            if(value.isEmpty)
+            {
+              return 'Поле не заполнено';
+            }
+
+            return null;
+          },
+        ),
         SizedBox(height: widget.padding),
-        CustomInput(label: 'Мобильный телефон', controller: numberPhoneMobileController, type: TextInputType.number, errorText: 
-          (widget.errors != null && widget.errors.containsKey('number_phone_mobile') == true)
-          ? widget.errors['number_phone_mobile']
-          : null ),
+        CustomInput(
+          label: 'Мобильный телефон',
+          placeholder: numberPhoneMobileController.text,
+          controller: numberPhoneMobileController,
+          type: TextInputType.number,
+          validator: (value) {
+            return null;
+          }
+        ),
         SizedBox(height: widget.padding),
         SizedBox(height: 5),
         CustomMultipleFilePicker(
@@ -388,20 +501,20 @@ class _SellerCreatePageState extends State<SellerCreatePage> {
         SizedBox(height: widget.padding),
         CustomFilePicker(
           text: "Фото для блока описание",
-          choosenImage: companyLogo,
+          choosenImage: descriptionBanner,
           onPressed: () async {
-            companyLogo = await FilePicker.getFile(
+            descriptionBanner = await FilePicker.getFile(
               type: FileType.image,
               allowCompression: true
             );
 
             setState(() {
-              companyLogo = companyLogo;
+              descriptionBanner = descriptionBanner;
             });
           },
           afterRemove: (){
             setState(() {
-              companyLogo = null;
+              descriptionBanner = null;
             });
           },
         ),
@@ -438,15 +551,26 @@ class _SellerCreatePageState extends State<SellerCreatePage> {
           }
         ),
         SizedBox(height: widget.padding),
-        CustomInput(height: 200, label: 'Описание компании', controller: companyDescriptionController, type: TextInputType.text, errorText: 
-          (widget.errors != null && widget.errors.containsKey('company_description') == true)
-          ? widget.errors['company_description']
-          : null ),
+        CustomInput(
+          height: 200,
+          label: 'Описание компании',
+          placeholder: companyDescriptionController.text,
+          controller: companyDescriptionController,
+          type: TextInputType.text,
+          validator: (value) {
+            return null;
+          }, 
+        ),
         SizedBox(height: widget.padding),
-        CustomInput(label: 'Ссылка на ролик в ютубе', controller: companyYoutubeLinkController, type: TextInputType.number, errorText: 
-          (widget.errors != null && widget.errors.containsKey('company_youtube_link') == true)
-          ? widget.errors['company_youtube_link']
-          : null ),
+        CustomInput(
+          label: 'Ссылка на ролик в ютубе',
+          placeholder: companyYoutubeLinkController.text,
+          controller: companyYoutubeLinkController,
+          type: TextInputType.url,
+          validator: (value) {
+            return null;
+          }, 
+        ),
         SizedBox(height: widget.padding),
         Center(
           child: CustomRaisedButton(
@@ -485,38 +609,11 @@ class _SellerCreatePageState extends State<SellerCreatePage> {
 
   Future createProfile(context) async
   {
-    Map errors = {};
-
     var auth = await DBProvider.db.getAuth();
     
     if(auth == Null)
     {
       return null;
-    }
-
-    if(companyNameController.text.length == 0)
-    {
-      errors.addEntries([MapEntry('company_name', 'Название компании не должно быть пустым')]);
-    }
-
-    if(regionController.text.length == 0)
-    {
-      errors.addEntries([MapEntry('region', 'Регион не должен быть пустым')]);
-    }
-
-    if(cityController.text.length == 0)
-    {
-      errors.addEntries([MapEntry('city', 'Город не должнен быть пустым')]);
-    }
-
-    if(nameController.text.length == 0)
-    {
-      errors.addEntries([MapEntry('name', 'Имя не должно быть пустым')]);
-    }
-
-    if(lastNameController.text.length == 0)
-    {
-      errors.addEntries([MapEntry('last_name', 'Имя не должно быть пустым')]);
     }
 
     if(languageCompany == null)
@@ -538,19 +635,7 @@ class _SellerCreatePageState extends State<SellerCreatePage> {
 
     if(countryCompany == null)
     {
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(13)
-            ),
-            title: Text('Не выбрана страна профиля'),
-          );
-        },
-      );
-
-      return false;
+      countryCompany = "ru";
     }
 
     if(mainBanner.isEmpty)
@@ -587,31 +672,33 @@ class _SellerCreatePageState extends State<SellerCreatePage> {
       return false;
     }
 
-    if(errors.length == 0)
+    if (_formKey.currentState.validate())
     {
-      Map _data;
-      Map _files;
 
-      _data.addEntries([
-        MapEntry('company_name', companyNameController.text),
-        MapEntry('region', regionController.text),
-        MapEntry('city', cityController.text),
-        MapEntry('index', indexController.text),
-        MapEntry('street', streetController.text),
-        MapEntry('number_home', numberHomeController.text),
-        MapEntry('number_build', numberBuildController.text),
-        MapEntry('number_room', numberRoomController.text),
-        MapEntry('phone', phoneController.text),
-        MapEntry('name', nameController.text),
-        MapEntry('last_name', lastNameController.text),
-        MapEntry('patronymic', patronymicController.text),
-        MapEntry('position', positionController.text),
-        MapEntry('number_phone', numberPhoneController.text),
-        MapEntry('number_phone_mobile', numberPhoneMobileController.text),
-        MapEntry('company_description', companyDescriptionController.text),
-        MapEntry('company_youtube_link', companyYoutubeLinkController.text),
-        MapEntry('profile_type', 'seller'),
-      ]);
+      Map<String, String> _data = {};
+      Map _files = {};
+
+      _data = {
+        'company_name': companyNameController.text.toString(),
+        'region': regionController.text.toString(),
+        'country': countryCompany.toUpperCase(),
+        'city': cityController.text.toString(),
+        'index': indexController.text.toString(),
+        'street': streetController.text.toString(),
+        'number_home': numberHomeController.text.toString(),
+        'number_build': numberBuildController.text.toString(),
+        'number_room': numberRoomController.text.toString(),
+        'name': nameController.text.toString(),
+        'last_name': lastNameController.text.toString(),
+        'patronymic': patronymicController.text.toString(),
+        'position': positionController.text.toString(),
+        'number_phone': numberPhoneController.text.toString(),
+        'number_phone_mobile': numberPhoneMobileController.text.toString(),
+        'company_description': companyDescriptionController.text.toString(),
+        'company_youtube_link': companyYoutubeLinkController.text.toString(),
+        'profile_type': 'seller',
+        'localisation': languageCompany.toLowerCase(),
+      };
 
       _files.addEntries([
         MapEntry('company_main_banner_images', []),
@@ -659,12 +746,6 @@ class _SellerCreatePageState extends State<SellerCreatePage> {
           )
         );
       }
-
-    } else
-    {
-      setState(() {
-        widget.errors = errors;
-      });
     }
   }
 }
