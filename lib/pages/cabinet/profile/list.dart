@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:g2r_market/helpers/db.dart';
 import 'package:g2r_market/helpers/navigator.dart';
 import 'package:g2r_market/pages/auth/sign_in_page.dart';
+import 'package:g2r_market/pages/cabinet/profile/create_buyer.dart';
 import 'package:g2r_market/pages/cabinet/profile/create_seller.dart';
 import 'package:g2r_market/pages/cabinet/profile/profile.dart';
 import 'package:g2r_market/services/profile.dart';
@@ -34,6 +35,8 @@ class _ProfileListPageState extends State<ProfileListPage> {
 
   bool _loaded = false;
   var _data;
+
+  String _selectedProfileType = 'seller';
       
   @override
   Widget build(BuildContext context) {
@@ -106,24 +109,36 @@ class _ProfileListPageState extends State<ProfileListPage> {
                           child: Container(
                             padding: EdgeInsets.all(8),
                             decoration: BoxDecoration(
-                              color: Colors.black54,
+                              color: (_selectedProfileType == 'seller') ? Colors.black54 : Colors.white,
                               borderRadius: BorderRadius.circular(13),
                               border: Border.all(color: Colors.black54)
                             ),
                             child: Text('Продавец'),
-                          )
+                          ),
+                          onTap: (){
+                            setState(() {
+                              _selectedProfileType = 'seller';
+                              _loaded = false;
+                            });
+                          },
                         ),
                         SizedBox(width: 20),
                         InkWell(
                           child: Container(
                             padding: EdgeInsets.all(8),
                             decoration: BoxDecoration(
-                              color: Colors.white,
+                              color: (_selectedProfileType == 'buyer') ? Colors.black54 : Colors.white,
                               borderRadius: BorderRadius.circular(13),
                               border: Border.all(color: Colors.black54)
                             ),
                             child: Text('Покупатель'),
-                          )
+                          ),
+                          onTap: (){
+                            setState(() {
+                              _selectedProfileType = 'buyer';
+                              _loaded = false;
+                            });
+                          },
                         )
                       ],
                     )
@@ -133,10 +148,10 @@ class _ProfileListPageState extends State<ProfileListPage> {
                   ),
                   CustomRaisedButton(
                     color: Colors.deepPurple[700],
-                    child: Text('Создать профиль'),
+                    child: Text('Создать профиль', style: TextStyle(color: Colors.white)),
                     onPressed: () => {
                       Navigator.push(context, AnimatedSizeRoute(
-                          builder: (context) => SellerCreatePage(profiles: data)
+                          builder: (context) => (_selectedProfileType == 'seller') ? SellerCreatePage(profiles: data) : BuyerCreatePage(profiles: data)
                         )
                       )
                     },
@@ -188,6 +203,7 @@ class _ProfileListPageState extends State<ProfileListPage> {
                         builder: (context) => ProfilePage(
                             profileId: data[i]['id'],
                             auth: widget.auth,
+                            profileType: _selectedProfileType
                           )
                         )
                       )
@@ -195,10 +211,16 @@ class _ProfileListPageState extends State<ProfileListPage> {
                     child: Container(
                       height: 80,
                       width: 80,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(13),
-                        image: DecorationImage(image: CachedNetworkImageProvider(data[i]['company_logo_image'], headers: {'Host': API_HOST}), fit: BoxFit.fill)
-                      ),
+                      decoration: 
+                      (_selectedProfileType == 'seller')
+                      ? BoxDecoration(
+                          borderRadius: BorderRadius.circular(13),
+                          image: DecorationImage(image: CachedNetworkImageProvider(data[i]['company_logo_image'], headers: {'Host': API_HOST}), fit: BoxFit.fill)
+                        )
+                      : BoxDecoration(
+                          borderRadius: BorderRadius.circular(13),
+                          image: DecorationImage(image: AssetImage('resources/images/default_profile_image.png'), fit: BoxFit.fill)
+                        ),
                       child: Align(
                         alignment: Alignment.bottomRight,
                         child: Container(
@@ -233,10 +255,12 @@ class _ProfileListPageState extends State<ProfileListPage> {
                           ),
                         ),
                         SizedBox(height: 20),
-                        Container(
-                          width: 200,
-                          child: Text(data[i]['company_description'], style: TextStyle(fontSize: 12), overflow: TextOverflow.ellipsis, maxLines: 2,)
-                        ),
+                        (_selectedProfileType == 'seller')
+                        ? Container(
+                            width: 200,
+                            child: Text(data[i]['company_description'], style: TextStyle(fontSize: 12), overflow: TextOverflow.ellipsis, maxLines: 2,)
+                          )
+                        : Container()
                       ],
                     ),
                   ),
@@ -259,7 +283,7 @@ class _ProfileListPageState extends State<ProfileListPage> {
       return 'NOT_AUTHORIZED';
     }
 
-    var profiles = await Profile.getProfiles(auth, 'seller');
+    var profiles = await Profile.getProfiles(auth, _selectedProfileType);
 
     return profiles;
   }

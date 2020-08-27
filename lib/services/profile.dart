@@ -74,7 +74,7 @@ class Profile {
     return profileList;
   }
 
-  static Future<Map> getProfileInfo(auth, int profileId) async
+  static Future<Map> getProfileInfo(auth, int profileId, String type) async
   {
     Map profile = {};
 
@@ -103,9 +103,11 @@ class Profile {
 
       var item = data['data'];
 
+      if(type == 'seller')
+      {
         if(item.containsKey('downloads') != false)
         {
-          if(item['downloads'].containsKey('company_main_banner_images') != false)
+          if(item['downloads'].isNotEmpty && item['downloads'].containsKey('company_main_banner_images') != false)
           {
             for (var mainBanner in item['downloads']['company_main_banner_images'])
             {
@@ -113,7 +115,7 @@ class Profile {
             }
           }
 
-          if(item['downloads'].containsKey('company_promo_banner_images') != false)
+          if(item['downloads'].isNotEmpty != 0 && item['downloads'].containsKey('company_promo_banner_images') != false)
           {
             for (var companyPromo in item['downloads']['company_promo_banner_images'])
             {
@@ -121,43 +123,44 @@ class Profile {
             }
           }
 
-          if(item['downloads'].containsKey('company_logo_image') != false)
+          if(item['downloads'].isNotEmpty != 0 && item['downloads'].containsKey('company_logo_image') != false)
           {
             companyLogo = '$API_URL/storage/${item['downloads']['company_logo_image'][0]['path']}';
           }
         }
+      }
 
-        var localisation;
+      var localisation;
 
-        switch (item['profile_properties']['company_name']['localisation_id']) {
-          case 1:
-            localisation = 'ru';
-            break;
-          case 2:
-            localisation = 'en';
-            break;
-          default:
-            localisation = 'zh';
-            break;
-        }
-        
-        profile = {
-          'id': item['id'],
-          'company_logo': companyLogo,
-          'company_promo': companyPromoImages,
-          'main_banner': companyMainBannerImages,
-          'localisation': localisation
-        };
+      switch (item['profile_properties']['company_name']['localisation_id']) {
+        case 1:
+          localisation = 'ru';
+          break;
+        case 2:
+          localisation = 'en';
+          break;
+        default:
+          localisation = 'zh';
+          break;
+      }
+      
+      profile = {
+        'id': item['id'],
+        'company_logo': companyLogo,
+        'company_promo': companyPromoImages,
+        'main_banner': companyMainBannerImages,
+        'localisation': localisation
+      };
 
-        for (var property in item['profile_properties'].values)
-        {
-          profile.addEntries([MapEntry(property['code'], property['value'])]);
-        }
+      for (var property in item['profile_properties'].values)
+      {
+        profile.addEntries([MapEntry(property['code'], property['value'])]);
+      }
 
-        for (var chars in item['characteristics'].entries)
-        {
-          profile.addEntries([chars]);
-        }
+      for (var chars in item['characteristics'].entries)
+      {
+        profile.addEntries([chars]);
+      }
     }
 
     return profile;
@@ -179,36 +182,37 @@ class Profile {
 
     dio.FormData formData = new dio.FormData.fromMap(data);
 
-    for (var file in files.entries)
+    if(files.isNotEmpty)
     {
-      if(file.value is String)
+      for (var file in files.entries)
       {
-        var formFile = await dio.MultipartFile.fromFile(file.value,
-          filename: basename(file.value),
-          contentType: MediaType("image", extension(file.value)));
+        if(file.value is String)
+        {
+          var formFile = await dio.MultipartFile.fromFile(file.value,
+            filename: basename(file.value),
+            contentType: MediaType("image", extension(file.value)));
 
-        formData.files.add(MapEntry(file.key, formFile));
-      }
+          formData.files.add(MapEntry(file.key, formFile));
+        }
 
-      if(file.value is List)
-      {
-        int index = 0;
+        if(file.value is List)
+        {
+          int index = 0;
 
-        for (var fileMultiple in file.value) {
-          var formFile = await dio.MultipartFile.fromFile(fileMultiple,
-            filename: basename(fileMultiple),
-            contentType: MediaType("image", extension(fileMultiple)));
+          for (var fileMultiple in file.value) {
+            var formFile = await dio.MultipartFile.fromFile(fileMultiple,
+              filename: basename(fileMultiple),
+              contentType: MediaType("image", extension(fileMultiple)));
 
-            String fileKey = "${file.key}[$index]";
+              String fileKey = "${file.key}[$index]";
 
-            index = index+1;
+              index = index+1;
 
-          formData.files.add(MapEntry(fileKey, formFile));
+            formData.files.add(MapEntry(fileKey, formFile));
+          }
         }
       }
     }
-
-    
 
     var response = await dioRequest.post(
       "/api/mobile/create/profile",

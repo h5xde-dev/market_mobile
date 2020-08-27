@@ -17,12 +17,14 @@ import 'package:g2r_market/widgets/youtube_frame.dart';
 class ProfilePage extends StatefulWidget {
 
   final int profileId;
+  final String profileType;
   final auth;
 
   ProfilePage({
     Key key,
-    this.profileId,
-    this.auth
+    @required this.profileId,
+    @required this.auth,
+    @required this.profileType
   }) : super(key: key);
 
   @override
@@ -123,14 +125,18 @@ class _ProfilePageState extends State<ProfilePage> {
 
   __profileInfo(data)
   {
+    List images = [];
 
-    List images = data['main_banner'];
-    
-    if(data.containsKey('company_promo') != false && data['company_promo'] != null)
+    if(widget.profileType == 'seller')
     {
-      for(var image in data['company_promo'])
+      images = data['main_banner'];
+    
+      if(data.containsKey('company_promo') != false && data['company_promo'] != null)
       {
-        images.add(image);
+        for(var image in data['company_promo'])
+        {
+          images.add(image);
+        }
       }
     }
 
@@ -148,7 +154,7 @@ class _ProfilePageState extends State<ProfilePage> {
               height: 30,
               width: 30,
               decoration: BoxDecoration(
-                image: DecorationImage(image: AssetImage('icons/flags/png/${data['localisation'].toString().toLowerCase()}.png', package: 'country_icons'), fit: BoxFit.fill),
+                image: DecorationImage(image: AssetImage('icons/flags/png/${(data['localisation'].toString().toLowerCase() != 'zh') ? data['localisation'].toString().toLowerCase() : 'cn'}.png', package: 'country_icons'), fit: BoxFit.fill),
                 borderRadius: BorderRadius.circular(13),
                 color: Colors.white,
               ),
@@ -156,31 +162,33 @@ class _ProfilePageState extends State<ProfilePage> {
           ],
         ),
         Divider(),
-        Column(
-          children: <Widget>[
-            CarouselSlider(
-              options: CarouselOptions(
-                enlargeCenterPage: true,
-                aspectRatio: 4/3,
-                viewportFraction: 0.9,
-                carouselController: buttonCarouselController,
-                initialPage: 1
+        (widget.profileType == 'seller')
+        ? Column(
+            children: <Widget>[
+              CarouselSlider(
+                options: CarouselOptions(
+                  enlargeCenterPage: true,
+                  aspectRatio: 4/3,
+                  viewportFraction: 0.9,
+                  carouselController: buttonCarouselController,
+                  initialPage: 1
+                ),
+                items: images.map<Widget>((i) {
+                  return new Builder(
+                    builder: (BuildContext context) {
+                      return new Container(
+                        width: MediaQuery.of(context).size.width,
+                        margin: EdgeInsets.symmetric(horizontal: 5.0),
+                        child: CachedNetworkImage(imageUrl: i, httpHeaders: {'Host': API_HOST}, fit: BoxFit.fill,),
+                      );
+                    },
+                  );
+                }).toList(),
               ),
-              items: images.map<Widget>((i) {
-                return new Builder(
-                  builder: (BuildContext context) {
-                    return new Container(
-                      width: MediaQuery.of(context).size.width,
-                      margin: EdgeInsets.symmetric(horizontal: 5.0),
-                      child: CachedNetworkImage(imageUrl: i, httpHeaders: {'Host': API_HOST}, fit: BoxFit.fill,),
-                    );
-                  },
-                );
-              }).toList(),
-            ),
-            Divider(),
-          ]
-        ),
+              Divider(),
+            ]
+          )
+        : SizedBox(),
         SizedBox(height: 10),
         Row(
           children: <Widget>[
@@ -332,7 +340,7 @@ class _ProfilePageState extends State<ProfilePage> {
       return null;
     }
 
-    Map data = await Profile.getProfileInfo(auth, widget.profileId);
+    Map data = await Profile.getProfileInfo(auth, widget.profileId, widget.profileType);
 
     data.addAll({'active': (activeProfile != data['id']) ? false : true});
 
