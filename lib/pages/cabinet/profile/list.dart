@@ -182,7 +182,7 @@ class _ProfileListPageState extends State<ProfileListPage> {
             case 'active':
               status = 'Подтверждён';
               break;
-            case 'waiting':
+            case 'wait':
               status = 'Ожидает подтверждения';
               break;
             default:
@@ -238,13 +238,13 @@ class _ProfileListPageState extends State<ProfileListPage> {
                   Padding(
                     padding: EdgeInsets.only(left: 16),
                     child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[
                         Container(
-                          width: 200,
                           child: Text(data[i]['company_name'], style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold), overflow: TextOverflow.clip, maxLines: 2)
                         ),
                         Container(
-                          width: 200,
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.start,
                             crossAxisAlignment: CrossAxisAlignment.start,

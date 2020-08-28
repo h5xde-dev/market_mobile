@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:g2r_market/static/api_methods.dart';
 import 'package:http/http.dart' as http;
 import 'package:dio/dio.dart' as dio;
@@ -146,6 +147,7 @@ class Profile {
       
       profile = {
         'id': item['id'],
+        'status': item['status'],
         'company_logo': companyLogo,
         'company_promo': companyPromoImages,
         'main_banner': companyMainBannerImages,
@@ -216,6 +218,53 @@ class Profile {
 
     var response = await dioRequest.post(
       "/api/mobile/create/profile",
+      data: formData,
+    );
+
+    if(response.statusCode == 200)
+    {
+      result = true;
+    }
+
+    return result;
+  }
+
+  static Future<bool> approve(auth, int profileId, List<File> files) async
+  {
+    bool result = false;
+
+    var dioRequest = dio.Dio();
+    dioRequest.options.baseUrl = API_URL;
+
+    dioRequest.options.headers = {
+      'Host': API_HOST,
+      'Authorization': 'Bearer ${auth['token']}',
+      'Content-Type': 'application/x-www-form-urlencoded'
+    };
+
+    dio.FormData formData = new dio.FormData.fromMap({
+      'profile': profileId
+    });
+
+    if(files.isNotEmpty)
+    {
+      int index = 0;
+
+      for (var fileMultiple in files)
+      {
+        var formFile = await dio.MultipartFile.fromFile(fileMultiple.path,
+          filename: basename(fileMultiple.path));
+
+          String fileKey = "documents[$index]";
+
+          index = index+1;
+
+        formData.files.add(MapEntry(fileKey, formFile));
+      }
+    }
+
+    var response = await dioRequest.post(
+      "/api/mobile/approve/profile",
       data: formData,
     );
 

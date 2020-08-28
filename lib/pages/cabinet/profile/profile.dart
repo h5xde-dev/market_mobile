@@ -1,7 +1,9 @@
+import 'dart:io';
 import 'dart:ui';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:flutter/material.dart';
 import 'package:g2r_market/helpers/db.dart';
@@ -138,6 +140,142 @@ class _ProfilePageState extends State<ProfilePage> {
           images.add(image);
         }
       }
+    }
+
+    List<Widget> _allowedActions()
+    {
+      List<Widget> _list = new List<Widget>();
+
+      switch (data['status'])
+      {
+        case 'active':
+          _list = [
+            (data['active'] == true)
+            ? CustomRaisedButton(
+                borderRaius: 0,
+                color: Colors.deepPurple[700],
+                child: Text('Выбран', style: TextStyle(color: Colors.white)),
+              )
+            : CustomRaisedButton(
+                borderRaius: 0,
+                color: Colors.deepPurple[700],
+                child: Text('Выбрать', style: TextStyle(color: Colors.white),),
+                onPressed: () async {
+
+                  await ProfileHelper.select(data['id']);
+
+                  setState(() {
+                    
+                  });
+                },
+              ),
+            CustomRaisedButton(
+              borderRaius: 0,
+              color: Colors.deepPurple[700],
+              child: Text('Редактировать', style: TextStyle(color: Colors.white),),
+              onPressed: (){},
+            ),
+            CustomRaisedButton(
+              borderRaius: 0,
+              color: Colors.red,
+              child: Text('Удалить', style: TextStyle(color: Colors.white),),
+              onPressed: (){},
+            ),
+          ];
+          break;
+        case 'wait':
+          _list = [
+            Center(
+              child: Container(
+                color: Colors.yellow[900],
+                height: 50,
+                width: MediaQuery.of(context).size.width - 40,
+                padding: EdgeInsets.all(8),
+                child: Center(
+                  child: Text('Ожидает подтверждения', style: TextStyle(color: Colors.white))
+                ),
+              )
+            )
+          ];
+          break;
+        default:
+          _list = [
+            CustomRaisedButton(
+              borderRaius: 0,
+              color: Colors.deepPurple[700],
+              width: 250,
+              child: Text('Подтвердить', style: TextStyle(color: Colors.white),),
+              onPressed: () async {
+                List<String> _allowedExtensions = [
+                  'jpeg',
+                  'png',
+                  'jpg',
+                  'gif',
+                  'svg',
+                  'docx',
+                  'doc',
+                  'xls',
+                  'xlsx',
+                  'ppt',
+                  'pptx',
+                  'csv',
+                  'odp',
+                  'ods',
+                  'txt',
+                  'odt'
+                ];
+
+                List<File> _documents = [];
+
+                _documents = await FilePicker.getMultiFile(
+                  type: FileType.custom,
+                  allowedExtensions: _allowedExtensions,
+                  allowCompression: true
+                );
+
+                if( _documents.isNotEmpty)
+                {
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return AlertDialog(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(13)
+                        ),
+                        title: Text('Вы действительно хотите подтвердить профиль?'),
+                        actions: [
+                          FlatButton(
+                            onPressed: () async {
+                              await Profile.approve(widget.auth, data['id'], _documents);
+                              Navigator.pop(context, false);
+                              setState(() {
+                                _loaded = false;
+                              });
+                            },
+                            child: Text('Да'),
+                          ),
+                          FlatButton(
+                            onPressed: () => Navigator.pop(context, false), // passing false
+                            child: Text('Отмена'),
+                          ),
+                        ],
+                      );
+                    },
+                  );
+                }
+              },
+            ),
+            CustomRaisedButton(
+              borderRaius: 0,
+              color: Colors.red,
+              child: Text('Удалить', style: TextStyle(color: Colors.white),),
+              onPressed: (){},
+            ),
+          ];
+          break;
+      }
+
+      return _list;
     }
 
     return Column(
@@ -289,39 +427,7 @@ class _ProfilePageState extends State<ProfilePage> {
             Divider(),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: <Widget>[
-                (data['active'] == true)
-                ? CustomRaisedButton(
-                    borderRaius: 0,
-                    color: Colors.deepPurple[700],
-                    child: Text('Выбран', style: TextStyle(color: Colors.white)),
-                  )
-                : CustomRaisedButton(
-                    borderRaius: 0,
-                    color: Colors.deepPurple[700],
-                    child: Text('Выбрать', style: TextStyle(color: Colors.white),),
-                    onPressed: () async {
-
-                      await ProfileHelper.select(data['id']);
-
-                      setState(() {
-                        
-                      });
-                    },
-                  ),
-                CustomRaisedButton(
-                  borderRaius: 0,
-                  color: Colors.deepPurple[700],
-                  child: Text('Редактировать', style: TextStyle(color: Colors.white),),
-                  onPressed: (){},
-                ),
-                CustomRaisedButton(
-                  borderRaius: 0,
-                  color: Colors.red,
-                  child: Text('Удалить', style: TextStyle(color: Colors.white),),
-                  onPressed: (){},
-                ),
-              ],
+              children: _allowedActions(),
             ),
           ],
         ),

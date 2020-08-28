@@ -19,9 +19,4 @@ class ProfileHelper {
 
     return selectedProfile;
   }
-
-  static Future create() async
-  {
-    
-  }
 }

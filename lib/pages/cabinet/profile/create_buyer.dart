@@ -1,6 +1,3 @@
-import 'dart:io';
-
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_masked_text/flutter_masked_text.dart';
 import 'package:flutter/material.dart';
@@ -12,8 +9,6 @@ import 'package:g2r_market/landing_page.dart';
 import 'package:g2r_market/pages/auth/sign_in_page.dart';
 import 'package:g2r_market/pages/cabinet/profile/list.dart';
 import 'package:g2r_market/services/profile.dart';
-import 'package:g2r_market/widgets/custom__file_picker.dart';
-import 'package:g2r_market/widgets/custom__multiple_file_picker.dart';
 import 'package:g2r_market/widgets/custom_input.dart';
 import 'package:g2r_market/widgets/custom_raised_button.dart';
 import 'package:country_code_picker/country_code_picker.dart';
