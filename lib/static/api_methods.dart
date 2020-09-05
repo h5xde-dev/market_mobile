@@ -23,6 +23,7 @@ class MarketApi {
   static String createSeller = '$API_URL/api/mobile/create/profile';
 
   static String fullCatalog = '$API_URL/api/mobile/categories';
+  static String getCategoriesList = '$API_URL/api/mobile/categories/list';
 
   static String accountInfo = '$API_URL/api/mobile/account';
   static String accountInfoUpdate = '$API_URL/api/mobile/account/edit';

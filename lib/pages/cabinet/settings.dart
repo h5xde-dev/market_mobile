@@ -3,9 +3,11 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:g2r_market/helpers/navigator.dart';
+import 'package:g2r_market/helpers/profile.dart';
 import 'package:g2r_market/pages/auth/sign_in_page.dart';
 import 'package:g2r_market/pages/cabinet/account_edit.dart';
 import 'package:g2r_market/pages/cabinet/chat_items.dart';
+import 'package:g2r_market/pages/cabinet/product/list.dart';
 import 'package:g2r_market/pages/cabinet/profile/list.dart';
 import 'package:g2r_market/widgets/cabinet_button.dart';
 import 'package:g2r_market/helpers/db.dart';
@@ -13,13 +15,23 @@ import 'package:g2r_market/landing_page.dart';
 import 'package:g2r_market/services/settings.dart';
 import 'package:g2r_market/static/api_methods.dart';
 
-class SettingsPage extends StatelessWidget {
+class SettingsPage extends StatefulWidget {
+  
 
   SettingsPage({
+    Key key,
     this.fromMain: false,
   });
 
   final bool fromMain;
+
+  @override
+  _SettingsPageState createState() => _SettingsPageState();
+}
+
+class _SettingsPageState extends State<SettingsPage> {
+
+  Map mainProfile = {};
       
   @override
   Widget build(BuildContext context) {
@@ -44,7 +56,7 @@ class SettingsPage extends StatelessWidget {
             return __content(context, null, spinkit);
           default:
             if (snapshot.hasError || snapshot.data == null)
-              return SignInPage(fromMain: fromMain);
+              return SignInPage(fromMain: widget.fromMain);
             else {
               return __content(context, snapshot.data, null);
             }
@@ -77,7 +89,7 @@ class SettingsPage extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: <Widget>[
-                      (fromMain == true)
+                      (widget.fromMain == true)
                       ? Center()
                       : InkWell(
                         child: Icon(Icons.arrow_back_ios),
@@ -139,7 +151,7 @@ class SettingsPage extends StatelessWidget {
     await DBProvider.db.deleteAccountInfo();
     await DBProvider.db.deleteAuth();
     
-    Navigator.pushReplacement(context, AnimatedSizeRoute(
+    Navigator.pushReplacement(context, AnimatedScaleRoute(
         builder: (context) => LandingPage(selectedPage: 1)
       )
     );
@@ -157,7 +169,7 @@ class SettingsPage extends StatelessWidget {
           color: Colors.white,
           width: 300,
           onPressed: (){
-            Navigator.push(context, AnimatedSizeRoute(
+            Navigator.push(context, AnimatedScaleRoute(
                 builder: (context) => AccountEditPage()
               )
             );
@@ -171,7 +183,7 @@ class SettingsPage extends StatelessWidget {
           onPressed: () async {
             var auth = await DBProvider.db.getAuth();
 
-            Navigator.push(context, AnimatedSizeRoute(
+            Navigator.push(context, AnimatedScaleRoute(
                 builder: (context) => ProfileListPage(auth: auth)
               )
             );
@@ -185,28 +197,46 @@ class SettingsPage extends StatelessWidget {
           onPressed: () async {
             var auth = await DBProvider.db.getAuth();
 
-            Navigator.push(context, AnimatedSizeRoute(
+            Navigator.push(context, AnimatedScaleRoute(
                 builder: (context) => ChatItems(auth: auth)
               )
             );
           },
         ),
         Divider(),
-        CabinetButton(
-          text: Text('Товары'),
-          icon: SvgPicture.asset('resources/svg/main/package.svg'),
-          counter: 1,
-          color: Colors.white,
-          width: 300,
-          onPressed: (){},
-        ),
+        (mainProfile != null && mainProfile['type'] == 'seller')
+        ? CabinetButton(
+            text: Text('Товары'),
+            icon: SvgPicture.asset('resources/svg/main/package.svg'),
+            counter: 1,
+            color: Colors.white,
+            width: 300,
+            onPressed: () async {
+              var auth = await DBProvider.db.getAuth();
+
+              Navigator.push(context, AnimatedScaleRoute(
+                  builder: (context) => ProductListPage(auth: auth, profileId: mainProfile['id'])
+                )
+              );
+            },
+          )
+        : (mainProfile['type'] == 'buyer')
+          ? CabinetButton(
+              text: Text('Запросы'),
+              icon: SvgPicture.asset('resources/svg/main/order.svg'),
+              counter: 1,
+              color: Colors.white,
+              width: 300,
+              onPressed: (){},
+            )
+          : Center()
       ]
     );
   }
 
   Future __updateUserInfo(context) async
   {
-    Navigator.push(context, AnimatedSizeRoute(
+    Navigator.push(context, AnimatedScaleRoute(
         builder: (context) => LandingPage(selectedPage: 3)
       )
     );
@@ -224,6 +254,19 @@ class SettingsPage extends StatelessWidget {
     await Settings.getAccountInfo(auth);
 
     var userInfo = await DBProvider.db.getAccountInfo();
+
+    if(mainProfile.isEmpty)
+    {
+      int profileId = await ProfileHelper.getSelectedProfile();
+
+      String profileType = await ProfileHelper.getProfileType(profileId);
+
+      mainProfile = {'id': profileId, 'type': profileType};
+
+      setState(() {
+        mainProfile = mainProfile;
+      });
+    }
 
     return userInfo;
   }

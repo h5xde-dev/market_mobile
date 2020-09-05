@@ -32,13 +32,11 @@ dependencies:
   camera:
   file_picker:
   sqflite:
-  dart_amqp:
   dio:
   http_parser:
   country_icons:
   carousel_slider:
   shared_preferences:
-  flutter_local_notifications:
   permission_handler:
   country_code_picker:
   background_fetch:
@@ -46,6 +44,7 @@ dependencies:
   path_provider:
   path:
   quick_actions:
+  search_widget:
   flutter:
     sdk: flutter
 

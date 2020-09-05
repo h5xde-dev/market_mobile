@@ -162,7 +162,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 child: Text('Выбрать', style: TextStyle(color: Colors.white),),
                 onPressed: () async {
 
-                  await ProfileHelper.select(data['id']);
+                  await ProfileHelper.select(data['id'], widget.profileType);
 
                   setState(() {
                     

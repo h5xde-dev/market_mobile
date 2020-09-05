@@ -62,4 +62,26 @@ class Category {
     return categories;
 
   }
+
+  static Future<List> getAllList() async
+  {
+    final response = await http.Client().get(
+      MarketApi.getCategoriesList,
+      headers: {
+        'Host': API_HOST
+      }
+    );
+
+    List categories;
+
+    if(response.statusCode == 200)
+    {
+      Map data = jsonDecode(response.body);
+
+      categories = data['data'];
+    }
+
+    return categories;
+
+  }
 }

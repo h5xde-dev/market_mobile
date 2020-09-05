@@ -199,7 +199,7 @@ class _ProfileListPageState extends State<ProfileListPage> {
                 children: <Widget>[
                   InkWell(
                     onTap: () => {
-                      Navigator.push(context, AnimatedScaleRoute(
+                      Navigator.push(context, AnimatedSizeRoute(
                         builder: (context) => ProfilePage(
                             profileId: data[i]['id'],
                             auth: widget.auth,
