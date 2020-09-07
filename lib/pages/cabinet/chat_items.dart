@@ -98,7 +98,7 @@ class _ChatItemsState extends State<ChatItems> {
         chats.add(
           new FlatChatItem(
             profileImage: FlatProfileImage(
-              imageUrl: chat['chat_image'].toString().replaceAll(new RegExp(r'g2r-market.su'), '176.99.5.64'),
+              imageUrl: chat['chat_image'].toString().replaceAll(new RegExp(r'g2r.market'), '176.99.5.64'),
               outlineIndicator: false,
               onlineIndicator: chat['status'] == 'online' ? true : false,
             ),

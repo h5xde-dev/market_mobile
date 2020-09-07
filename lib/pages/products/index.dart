@@ -269,33 +269,45 @@ class _ProductPageState extends State<ProductPage> {
                 Row(
                   children: <Widget>[
                     Text('Мин. заказ: ', style: TextStyle(fontSize: 16, color: Colors.black45)),
-                    Text('${data[0]['min_order']['value']}, ${data[0]['min_order']['type']}', style: TextStyle(fontSize: 16)),
+                    (data[0].containsKey('min_order') && data[0]['min_order'] != null)
+                    ? Text('${data[0]['min_order']['value']}, ${data[0]['min_order']['type']}', style: TextStyle(fontSize: 16))
+                    : Text('Не указано', style: TextStyle(fontSize: 16)),
                   ],
                 ),
                 Row(
                   children: <Widget>[
                     Text('Доступно: ', style: TextStyle(fontSize: 16, color: Colors.black45)),
-                    (_selectedModel == null)
-                    ? Text('${data[0]['available']['value']}, ${data[0]['available']['type']}', style: TextStyle(fontSize: 16))
-                    : Text('${_selectedModel['available']['value']}, ${_selectedModel['available']['type']}', style: TextStyle(fontSize: 16))
+                    (data[0].containsKey('available') && data[0]['available'] != null)
+                    ? (_selectedModel == null)
+                      ? Text('${data[0]['available']['value']}, ${data[0]['available']['type']}', style: TextStyle(fontSize: 16))
+                      : Text('${_selectedModel['available']['value']}, ${_selectedModel['available']['type']}', style: TextStyle(fontSize: 16))
+                    : Text('Не указано', style: TextStyle(fontSize: 16))
                   ],
                 ),
                 Row(
                   children: <Widget>[
                     Text('Вес: ', style: TextStyle(fontSize: 16, color: Colors.black45)),
-                    Text('${data[0]['weight']['value']}, ${data[0]['weight']['type']}', style: TextStyle(fontSize: 16)),
+                    (data[0].containsKey('weight') && data[0]['weight'] != null)
+                    ? Text('${data[0]['weight']['value']}, ${data[0]['weight']['type']}', style: TextStyle(fontSize: 16))
+                    : Text('Не указан', style: TextStyle(fontSize: 16)),
                   ],
                 ),
                 Row(
                   children: <Widget>[
                     Text('Длина: ', style: TextStyle(fontSize: 12, color: Colors.black45)),
-                    Text('${data[0]['lenght']['value']}, ${data[0]['lenght']['type']}', style: TextStyle(fontSize: 16)),
+                    (data[0].containsKey('lenght') && data[0]['lenght'] != null)
+                      ? Text('${data[0]['lenght']['value']}, ${data[0]['lenght']['type']}', style: TextStyle(fontSize: 16))
+                      : Text('0', style: TextStyle(fontSize: 16)),
                     SizedBox(width: 5),
                     Text('Высота: ', style: TextStyle(fontSize: 12, color: Colors.black45)),
-                    Text('${data[0]['height']['value']}, ${data[0]['height']['type']}', style: TextStyle(fontSize: 16)),
+                    (data[0].containsKey('height') && data[0]['height'] != null)
+                      ? Text('${data[0]['height']['value']}, ${data[0]['height']['type']}', style: TextStyle(fontSize: 16))
+                      : Text('0', style: TextStyle(fontSize: 16)),
                     SizedBox(width: 5),
                     Text('Ширина: ', style: TextStyle(fontSize: 12, color: Colors.black45)),
-                    Text('${data[0]['width']['value']}, ${data[0]['width']['type']}', style: TextStyle(fontSize: 16)),
+                    (data[0].containsKey('width') && data[0]['width'] != null)
+                     ? Text('${data[0]['width']['value']}, ${data[0]['width']['type']}', style: TextStyle(fontSize: 16))
+                     : Text('0', style: TextStyle(fontSize: 16)),
                   ],
                 ),
               ],
@@ -309,7 +321,9 @@ class _ProductPageState extends State<ProductPage> {
           children: <Widget>[
             Divider(),
             Text('Торговые предложения:', style: TextStyle(fontSize: 22)),
-            __productModels(data, data[0]['product_models']),         
+            (data[0].containsKey('product_models') && data[0]['product_models'] != null)
+            ? __productModels(data, data[0]['product_models'])
+            : Center(),         
             Divider(),
             SizedBox(height: 10),
             Text('Описание:', style: TextStyle(fontSize: 22)),
@@ -317,7 +331,9 @@ class _ProductPageState extends State<ProductPage> {
             Text(data[0]['description'], style: TextStyle(fontSize: 18)),
             SizedBox(height: 5),
             Divider(),
-            YouTubeFrame(url: data[0]['youtube'])
+            (data[0].containsKey('youtube') && data[0]['youtube'] != null)
+            ? YouTubeFrame(url: data[0]['youtube'])
+            : Center()
           ],
         ),
       ],

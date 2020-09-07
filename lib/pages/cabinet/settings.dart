@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:g2r_market/helpers/navigator.dart';
 import 'package:g2r_market/helpers/profile.dart';
+import 'package:g2r_market/helpers/user.dart';
 import 'package:g2r_market/pages/auth/sign_in_page.dart';
 import 'package:g2r_market/pages/cabinet/account_edit.dart';
 import 'package:g2r_market/pages/cabinet/chat_items.dart';
@@ -32,6 +33,7 @@ class SettingsPage extends StatefulWidget {
 class _SettingsPageState extends State<SettingsPage> {
 
   Map mainProfile = {};
+  List roles = [];
       
   @override
   Widget build(BuildContext context) {
@@ -175,6 +177,23 @@ class _SettingsPageState extends State<SettingsPage> {
             );
           },
         ),
+        Visibility(
+          visible: (roles.isNotEmpty && roles.contains('site_manager')),
+          child: CabinetButton(
+            text: Text('Кабинет менеджера'),
+            icon: SvgPicture.asset('resources/svg/main/operator.svg'),
+            color: Colors.white,
+            width: 300,
+            onPressed: () async {
+              var auth = await DBProvider.db.getAuth();
+
+              Navigator.push(context, AnimatedScaleRoute(
+                  builder: (context) => ProfileListPage(auth: auth)
+                )
+              );
+            },
+          )
+        ),
         CabinetButton(
           text: Text('Мои профили'),
           icon: SvgPicture.asset('resources/svg/main/users.svg'),
@@ -265,6 +284,15 @@ class _SettingsPageState extends State<SettingsPage> {
 
       setState(() {
         mainProfile = mainProfile;
+      });
+    }
+
+    if(roles.isEmpty)
+    {
+      List _roles = await UserHelper.getRoles();
+
+      setState(() {
+        roles = _roles;
       });
     }
 

@@ -125,6 +125,8 @@ class _SignInPageState extends State<SignInPage> {
   {
     Map errors = {};
 
+    print(emailController.text);
+
     if(passwordController.text.length < 8)
     {
       errors.addEntries([MapEntry('password', 'Пароль должен быть от 8 символов')]);

@@ -1,3 +1,4 @@
+import 'package:g2r_market/helpers/user.dart';
 import 'package:g2r_market/helpers/user_base.dart';
 import 'package:g2r_market/helpers/db.dart';
 import 'package:g2r_market/static/api_methods.dart';
@@ -35,8 +36,18 @@ class Settings {
           var userMap = {
               'userId': data['id'],
               'name': data['name'],
-              'avatar': avatar,
+              'avatar': avatar
           };
+          
+          if(data['roles'][0] != null)
+          {
+
+            List<String> roles = data['roles'].map<String>((role) {
+              return role.toString();
+            }).toList();
+
+            await UserHelper.setRoles(roles);
+          }
 
           if(data.containsKey('account'))
           {
