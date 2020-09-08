@@ -168,7 +168,7 @@ class _ChatPageState extends State<ChatPage> {
   {
     var profileId = await ProfileHelper.getSelectedProfile();
 
-    if(profileId != Null)
+    if(profileId.runtimeType != Null)
     {
       await Chat.sendProfile(widget.auth, widget.chat['id'], profileId, widget.chat['profile_id'], message);
 
@@ -220,7 +220,7 @@ class _ChatPageState extends State<ChatPage> {
 
       var profileId = await ProfileHelper.getSelectedProfile();
 
-      if(profileId != Null)
+      if(profileId.runtimeType != Null)
       {
         List newData = await Chat.getMessages(widget.auth, widget.chat['id'], profileId, _page);
 

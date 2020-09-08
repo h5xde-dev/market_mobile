@@ -233,7 +233,7 @@ class _ChatItemsState extends State<ChatItems> {
     
     var profileId = await ProfileHelper.getSelectedProfile();
 
-    if(profileId != Null)
+    if(profileId.runtimeType != Null)
     {
       profile = profileId;
     }

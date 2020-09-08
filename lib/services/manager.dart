@@ -1,13 +1,8 @@
 import 'dart:convert';
-import 'dart:io';
 import 'package:g2r_market/static/api_methods.dart';
 import 'package:http/http.dart' as http;
-import 'package:dio/dio.dart' as dio;
-import 'package:http_parser/http_parser.dart';
 import 'dart:async';
 import 'dart:core';
-
-import 'package:path/path.dart';
 
 class Manager {
 

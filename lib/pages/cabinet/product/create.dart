@@ -6,16 +6,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:g2r_market/extesions/color.dart';
-import 'package:g2r_market/helpers/navigator.dart';
 import 'package:g2r_market/helpers/db.dart';
-import 'package:g2r_market/landing_page.dart';
+import 'package:g2r_market/helpers/navigator.dart';
+import 'package:g2r_market/pages/cabinet/product/list.dart';
 import 'package:g2r_market/services/categories.dart';
+import 'package:g2r_market/services/product.dart';
 import 'package:g2r_market/widgets/custom__file_picker.dart';
 import 'package:g2r_market/widgets/custom__multiple_file_picker.dart';
 import 'package:g2r_market/widgets/custom_input.dart';
 import 'package:g2r_market/widgets/custom_raised_button.dart';
 import 'package:country_code_picker/country_code_picker.dart';
-import 'package:search_widget/search_widget.dart';
+import 'package:g2r_market/widgets/search_bar.dart';
 
 // ignore: must_be_immutable
 class ProductCreatePage extends StatefulWidget{
@@ -55,7 +56,10 @@ class _ProductCreatePageState extends State<ProductCreatePage> {
   final TextEditingController lenghtValueController = TextEditingController();
   final TextEditingController sizeTypeController = TextEditingController();
 
+
   String countryProduct;
+
+  Map selectedCategory;
   Map colorProduct = {'transparent': 'Не выбран'};
   Map weightType = {'gr': 'грамм'};
   Map sizeType = {'mm': 'мм'};
@@ -87,7 +91,7 @@ class _ProductCreatePageState extends State<ProductCreatePage> {
   };
 
   List<DropdownMenuItem> colors = [];
-  List<Map> categoryList = [];
+  List categoryList = [];
 
   bool _loaded = false;
       
@@ -160,10 +164,7 @@ class _ProductCreatePageState extends State<ProductCreatePage> {
                         child: Icon(Icons.arrow_back_ios),
                         onTap: () => Navigator.pop(context, true),
                       ),
-                      InkWell(
-                        child: Text('Выход'),
-                        onTap: () => __logout(context),
-                      ), 
+                      Center()
                     ],
                   ),
                   SizedBox(height: 20),
@@ -172,7 +173,7 @@ class _ProductCreatePageState extends State<ProductCreatePage> {
                       children: [
                         Form(
                           key: _formKey,
-                          child: __accountEdit(context),
+                          child: __accountEdit(context, categoryList),
                         )
                       ]
                     )
@@ -186,37 +187,30 @@ class _ProductCreatePageState extends State<ProductCreatePage> {
     );
   }
 
-  Future __logout(context) async
+  Widget __accountEdit(context, categoryList)
   {
-    await DBProvider.db.deleteAccountInfo();
-    await DBProvider.db.deleteAuth();
-    
-    Navigator.pushReplacement(context, AnimatedSizeRoute(
-        builder: (context) => LandingPage(selectedPage: 1)
-      )
-    );
-  }
 
-  Widget __accountEdit(context)
-  {
+    List categoryListNames = new List<String>.unmodifiable(
+      categoryList.map((e) => 
+        e['name'].toString()
+      ).toList()
+    );
     
     return Column(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        SearchWidget(
-          dataList: categoryList,
-          popupListItemBuilder: (Map item) {
-            return Text(item['name']);
-          },
-          selectedItemBuilder: (Map item, deleteItem) {
-            return Container(
-              child: Text(item['name']),
-            );
-          },
-          queryBuilder: (String query, List<Map> list) {
-            print(categoryList); print(query);
-            return list.where((Map item) => item['name'].toLowerCase().contains(query.toLowerCase())).toList();
+        SearchBar(
+          hint: "Выберите категорию",
+          items: categoryListNames,
+          selectedItem: selectedCategory,
+          onChanged: (item) {
+
+            int index = categoryListNames.indexWhere((element) => item == element);
+
+            setState(() {
+              selectedCategory = categoryList[index];
+            });
           },
         ),
         SizedBox(height: widget.padding),
@@ -351,8 +345,8 @@ class _ProductCreatePageState extends State<ProductCreatePage> {
             CustomInput(
               label: 'Доступное количество',
               width: 200,
-              placeholder: minOrderValueController.text,
-              controller: minOrderValueController,
+              placeholder: availableValueController.text,
+              controller: availableValueController,
               type: TextInputType.number,
               validator: (value) {
                 if(value.isEmpty)
@@ -411,7 +405,7 @@ class _ProductCreatePageState extends State<ProductCreatePage> {
           onChanged: (item)
           {
             setState(() {
-              colorProduct = item;
+              colorProduct = Map.fromEntries([item]);
             });
           }
         ),
@@ -619,7 +613,7 @@ class _ProductCreatePageState extends State<ProductCreatePage> {
         SizedBox(height: widget.padding),
         Center(
           child: CustomRaisedButton(
-            onPressed: () async => await createProfile(context),
+            onPressed: () async => await createProduct(context),
             color: Colors.white,
             child: Text('Сохранить'),
           )
@@ -630,14 +624,22 @@ class _ProductCreatePageState extends State<ProductCreatePage> {
 
   Future getList() async
   {
-    var categories;
+    if(categoryList != null && _loaded == false)
+    {
+      setState(() {
+        _loaded = true;
+        categoryList = categoryList;
+      });
+    }
+    
+    List categories;
 
     categories = await Category.getAllList();
 
     return categories;
   }
 
-  Future createProfile(context) async
+  Future createProduct(context) async
   {
     var auth = await DBProvider.db.getAuth();
     
@@ -654,39 +656,83 @@ class _ProductCreatePageState extends State<ProductCreatePage> {
     if (_formKey.currentState.validate())
     {
 
-      /* Map<String, String> _data = {};
+      Map<String, dynamic> _data = {};
       Map _files = {};
 
       _data = {
-        'company_name': companyNameController.text.toString(),
-        'region': regionController.text.toString(),
-        'country': countryProduct.toUpperCase(),
-        'city': cityController.text.toString(),
-        'index': indexController.text.toString(),
-        'street': streetController.text.toString(),
-        'number_home': numberHomeController.text.toString(),
-        'number_build': numberBuildController.text.toString(),
-        'number_room': numberRoomController.text.toString(),
+        'category_id': selectedCategory['id'].toString(),
+        'articul': articulController.text.toString(),
         'name': nameController.text.toString(),
-        'last_name': lastNameController.text.toString(),
-        'patronymic': patronymicController.text.toString(),
-        'position': positionController.text.toString(),
-        'number_phone': numberPhoneController.text.toString(),
-        'profile_type': 'buyer',
-        'localisation': languageCompany.toLowerCase(),
+        'country': countryProduct.toString().toUpperCase(),
+        'min_price': minPriceController.text.toString(),
+        'max_price':maxPriceController.text.toString(),
+        'available': {
+          'value': availableValueController.text.toString(),
+          'type': availableType.keys.first.toString(),
+        },
+        'min_order': {
+          'value': minOrderValueController.text.toString(),
+          'type': minOrderType.keys.first.toString(),
+        },
+        'color': colorProduct.keys.first.toString(),
+        'description': descriptionController.text.toString(),
+        'seo_keywords': seoKeywordsController.text.toString(),
+        'seo_title': seoTitleController.text.toString(),
+        'seo_descriptions': seoDescriptionsController.text.toString(),
+        'weight': {
+          'value': weightValueController.text.toString(),
+          'type': weightType.keys.first.toString(),
+        },
+        'lenght': {
+          'value': lenghtValueController.text.toString(),
+          'type': sizeType.keys.first.toString()
+        },
+        'width': {
+          'value': widthValueController.text.toString(),
+          'type': sizeType.keys.first.toString()
+        },
+        'height': {
+          'value': heightValueController.text.toString(),
+          'type': sizeType.keys.first.toString()
+        }
       };
 
-      var result = await Profile.create(auth, _data, _files);
+      _files.addEntries([
+        MapEntry('preview_image', previewImage.path)
+      ]);
+
+      if(describleImages.isNotEmpty)
+      {
+        _files.addEntries([MapEntry('describle_images', [])]);
+
+        for (var item in describleImages)
+        {
+          _files['describle_images'].add(item.file.path);
+        }
+      }
+
+      if(detailImages.isNotEmpty)
+      {
+        _files.addEntries([MapEntry('detail_images', [])]);
+
+        for (var item in detailImages)
+        {
+          _files['detail_images'].add(item.file.path);
+        }
+      }
+
+      var result = await Product.create(auth, _data, _files, widget.profileId);
 
       if(result == true)
       {
         Navigator.pushReplacement(context, AnimatedScaleRoute(
-          builder: (context) => ProfileListPage(
+          builder: (context) => ProductListPage(
               auth: auth,
+              profileId: widget.profileId,
             )
           )
         );
-      } */
+      }
     }
   }
 }

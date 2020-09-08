@@ -11,7 +11,6 @@ import 'package:g2r_market/helpers/profile.dart';
 import 'package:g2r_market/helpers/user.dart';
 import 'package:g2r_market/services/manager.dart';
 import 'package:g2r_market/services/profile.dart';
-import 'package:g2r_market/static/api_methods.dart';
 import 'package:g2r_market/widgets/bottom_navbar.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:g2r_market/widgets/custom_raised_button.dart';

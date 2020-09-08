@@ -1,19 +1,14 @@
 import 'dart:ui';
 
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:flutter/material.dart';
-import 'package:g2r_market/helpers/db.dart';
 import 'package:g2r_market/helpers/navigator.dart';
-import 'package:g2r_market/pages/auth/sign_in_page.dart';
-import 'package:g2r_market/pages/cabinet/profile/profile.dart';
 import 'package:g2r_market/pages/manager/create_company.dart';
 import 'package:g2r_market/pages/manager/list_profiles.dart';
 import 'package:g2r_market/services/manager.dart';
 import 'package:g2r_market/widgets/bottom_navbar.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:g2r_market/widgets/custom_raised_button.dart';
-import 'package:g2r_market/static/api_methods.dart';
 
 class CompanyListPage extends StatefulWidget {
   
@@ -33,8 +28,6 @@ class _CompanyListPageState extends State<CompanyListPage> {
 
   bool _loaded = false;
   var _data;
-
-  String _selectedProfileType = 'seller';
       
   @override
   Widget build(BuildContext context) {

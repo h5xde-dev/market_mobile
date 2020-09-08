@@ -44,7 +44,7 @@ dependencies:
   path_provider:
   path:
   quick_actions:
-  search_widget:
+  find_dropdown:
   flutter:
     sdk: flutter
 
