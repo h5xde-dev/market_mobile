@@ -39,4 +39,11 @@ class MarketApi {
   static String favoriteProductAdd = '$API_URL/api/mobile/favorite/product/add';
   static String favoriteProductRemove = '$API_URL/api/mobile/favorite/product/remove';
   static String favoriteProductGet = '$API_URL/api/mobile/favorite/product';
+
+  //Rабинет менеджера
+  static String getCompanies = '$API_URL/api/mobile/companies';
+  static String getCompanyProfiles = '$API_URL/api/mobile/company/profiles';
+  static String createCompany = '$API_URL/api/mobile/company/store';
+  static String approveCompanyProfile = '$API_URL/api/mobile/company/approval/';
+
 }

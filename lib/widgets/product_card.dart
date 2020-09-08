@@ -45,7 +45,7 @@ class _ProductCardState extends State<ProductCard> {
         width: 100,
         decoration:  (widget.image != null)
         ? BoxDecoration(
-            image: DecorationImage(image: CachedNetworkImageProvider(widget.image, headers: {'Host': API_HOST}), fit: BoxFit.cover),
+            image: DecorationImage(image: ResizeImage(CachedNetworkImageProvider(widget.image, headers: {'Host': API_HOST}), height: 300, width: 300, allowUpscaling: true), fit: BoxFit.cover),
             borderRadius: BorderRadius.circular(13),
           )
         : BoxDecoration(

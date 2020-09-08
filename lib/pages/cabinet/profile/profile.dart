@@ -8,6 +8,8 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:flutter/material.dart';
 import 'package:g2r_market/helpers/db.dart';
 import 'package:g2r_market/helpers/profile.dart';
+import 'package:g2r_market/helpers/user.dart';
+import 'package:g2r_market/services/manager.dart';
 import 'package:g2r_market/services/profile.dart';
 import 'package:g2r_market/static/api_methods.dart';
 import 'package:g2r_market/widgets/bottom_navbar.dart';
@@ -206,6 +208,19 @@ class _ProfilePageState extends State<ProfilePage> {
               width: 250,
               child: Text('Подтвердить', style: TextStyle(color: Colors.white),),
               onPressed: () async {
+
+                List roles = await UserHelper.getRoles();
+
+                if(roles.contains('site_manager'))
+                {
+                  await Manager.approve(widget.auth, data['id']);
+                    Navigator.pop(context, false);
+                    setState(() {
+                      _loaded = false;
+                    });
+                  return null;
+                }
+
                 List<String> _allowedExtensions = [
                   'jpeg',
                   'png',
@@ -247,11 +262,11 @@ class _ProfilePageState extends State<ProfilePage> {
                           FlatButton(
                             onPressed: () async {
                               await Profile.approve(widget.auth, data['id'], _documents);
-                              Navigator.pop(context, false);
-                              setState(() {
-                                _loaded = false;
-                              });
-                            },
+                                Navigator.pop(context, false);
+                                setState(() {
+                                  _loaded = false;
+                                });
+                              },
                             child: Text('Да'),
                           ),
                           FlatButton(
@@ -316,8 +331,11 @@ class _ProfilePageState extends State<ProfilePage> {
                     builder: (BuildContext context) {
                       return new Container(
                         width: MediaQuery.of(context).size.width,
-                        margin: EdgeInsets.symmetric(horizontal: 5.0),
-                        child: CachedNetworkImage(imageUrl: i, httpHeaders: {'Host': API_HOST}, fit: BoxFit.fill,),
+                        height: 200,
+                        decoration: BoxDecoration(
+                          image: DecorationImage(image: ResizeImage(CachedNetworkImageProvider(i), width:  500, height: 500, allowUpscaling: true), fit: BoxFit.fill)
+                        ),
+                        margin: EdgeInsets.symmetric(horizontal: 5.0)
                       );
                     },
                   );
@@ -359,14 +377,14 @@ class _ProfilePageState extends State<ProfilePage> {
                 SizedBox(height: 10),
                 Row(
                   children: <Widget>[
-                    (data['region'] != null) ? Text('${data['region']} , ') : Text(' , '),
-                    (data['city'] != null) ? Text('${data['city']}') : Text(''),
+                    (data.containsKey('region') && data['region'] != null) ? Text('${data['region']} , ') : Text(' , '),
+                    (data.containsKey('city') && data['city'] != null) ? Text('${data['city']}') : Text(''),
                   ],
                 ),
                 Row(
                   children: <Widget>[
-                    (data['street'] != null) ? Text('${data['street']} , ') : Text(' , '),
-                    (data['number_home'] != null) ? Text('${data['number_home']}') : Text(''),
+                    (data.containsKey('street') && data['street'] != null) ? Text('${data['street']} , ') : Text(' , '),
+                    (data.containsKey('number_home') && data['number_home'] != null) ? Text('${data['number_home']}') : Text(''),
                   ],
                 ),
               ]
@@ -397,33 +415,33 @@ class _ProfilePageState extends State<ProfilePage> {
             Row(
               children: <Widget>[
                 Text('Контактное лицо: ', style: TextStyle(fontSize: 12, color: Colors.black54)),
-                (data['name'] != null || data['last_name'] != null) ? Text('${data['name']} ${data['last_name']}') : Text(''),
+                (data.containsKey('name') && data['name'] != null || data['last_name'] != null) ? Text('${data['name']} ${data['last_name']}') : Text(''),
               ],
             ),
             Row(
               children: <Widget>[
                 Text('Должность: ', style: TextStyle(fontSize: 12, color: Colors.black54)),
-                (data['position'] != null) ? Text(data['position']) : Text('Не указана'),
+                (data.containsKey('position') && data['position'] != null) ? Text(data['position']) : Text('Не указана'),
               ],
             ),
             Row(
               children: <Widget>[
                 Text('Номер телефона: ', style: TextStyle(fontSize: 12, color: Colors.black54)),
-                (data['number_phone'] != null) ? Text(data['number_phone']) : Text('Не указан'),
+                (data.containsKey('number_phone') && data['number_phone'] != null) ? Text(data['number_phone']) : Text('Не указан'),
               ],
             ),
             Row(
               children: <Widget>[
                 Text('Номер телефона (мобильный): ', style: TextStyle(fontSize: 12, color: Colors.black54)),
-                (data['number_phone_mobile'] != null) ? Text(data['number_phone_mobile']) : Text('Не указан'),
+                (data.containsKey('number_phone_mobile') && data['number_phone_mobile'] != null) ? Text(data['number_phone_mobile']) : Text('Не указан'),
               ],
             ),
             Divider(),
             Text('Описание', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
             SizedBox(height: 10),
-            (data['company_description'] != null) ? Text(data['company_description']) : Text('Без описания'),
+            (data.containsKey('company_description') && data['company_description'] != null) ? Text(data['company_description']) : Text('Без описания'),
             SizedBox(height: 10),
-            (data['company_youtube_link'] != null) ? YouTubeFrame(url: data['company_youtube_link']) : Center(),
+            (data.containsKey('company_youtube_link') && data['company_youtube_link'] != null) ? YouTubeFrame(url: data['company_youtube_link']) : Center(),
             Divider(),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,

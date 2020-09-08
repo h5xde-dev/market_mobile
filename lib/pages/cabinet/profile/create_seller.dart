@@ -8,9 +8,11 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:g2r_market/helpers/navigator.dart';
 import 'package:g2r_market/helpers/db.dart';
+import 'package:g2r_market/helpers/user.dart';
 import 'package:g2r_market/landing_page.dart';
 import 'package:g2r_market/pages/auth/sign_in_page.dart';
 import 'package:g2r_market/pages/cabinet/profile/list.dart';
+import 'package:g2r_market/pages/manager/list_profiles.dart';
 import 'package:g2r_market/services/profile.dart';
 import 'package:g2r_market/widgets/custom__file_picker.dart';
 import 'package:g2r_market/widgets/custom__multiple_file_picker.dart';
@@ -24,9 +26,11 @@ class SellerCreatePage extends StatefulWidget{
 
   final double padding = 10;
   final profiles;
+  final int companyId;
 
   SellerCreatePage({
-    this.profiles,
+    @required this.profiles,
+    this.companyId: 0,
     Key key
   }) : super(key: key);
 
@@ -678,6 +682,8 @@ class _SellerCreatePageState extends State<SellerCreatePage> {
       Map<String, String> _data = {};
       Map _files = {};
 
+      List roles = await UserHelper.getRoles();
+
       _data = {
         'company_name': companyNameController.text.toString(),
         'region': regionController.text.toString(),
@@ -699,6 +705,11 @@ class _SellerCreatePageState extends State<SellerCreatePage> {
         'profile_type': 'seller',
         'localisation': languageCompany.toLowerCase(),
       };
+
+      if(roles.contains('site_manager'))
+      {
+        _data['company_user'] = widget.companyId.toString();
+      }
 
       _files.addEntries([
         MapEntry('company_main_banner_images', []),
@@ -739,12 +750,20 @@ class _SellerCreatePageState extends State<SellerCreatePage> {
 
       if(result == true)
       {
-        Navigator.pushReplacement(context, AnimatedScaleRoute(
-          builder: (context) => ProfileListPage(
-              auth: auth,
+        (widget.companyId == 0)
+        ? Navigator.pushReplacement(context, AnimatedScaleRoute(
+            builder: (context) => ProfileListPage(
+                auth: auth,
+              )
             )
           )
-        );
+        : Navigator.pushReplacement(context, AnimatedScaleRoute(
+            builder: (context) => CompanyProfileListPage(
+                auth: auth,
+                companyId: widget.companyId,
+              )
+            )
+          );
       }
     }
   }

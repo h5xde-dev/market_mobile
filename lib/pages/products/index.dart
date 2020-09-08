@@ -164,8 +164,11 @@ class _ProductPageState extends State<ProductPage> {
                   builder: (BuildContext context) {
                     return Container(
                       width: MediaQuery.of(context).size.width,
-                      margin: EdgeInsets.symmetric(horizontal: 5.0),
-                      child: CachedNetworkImage(imageUrl: i, httpHeaders: {'Host': API_HOST}, fit: BoxFit.fill,),
+                      height: 200,
+                      decoration: BoxDecoration(
+                        image: DecorationImage(image: ResizeImage(CachedNetworkImageProvider(i, headers: {'Host': API_HOST}), height: 500, width: 500, allowUpscaling: true), fit: BoxFit.fill)
+                      ),
+                      margin: EdgeInsets.symmetric(horizontal: 5.0)
                     );
                   },
                 );
@@ -352,7 +355,7 @@ class _ProductPageState extends State<ProductPage> {
             height: 70,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(13),
-              image: DecorationImage(image: CachedNetworkImageProvider(data[0]['preview_image'], headers: {'Host': API_HOST}), fit: BoxFit.cover)
+              image: DecorationImage(image: ResizeImage(CachedNetworkImageProvider(data[0]['preview_image'], headers: {'Host': API_HOST}), height: 100, width: 100, allowUpscaling: true), fit: BoxFit.cover)
             ),
           ),
           onTap: () => setState((){
@@ -367,7 +370,7 @@ class _ProductPageState extends State<ProductPage> {
             height: 70,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(13),
-              image: DecorationImage(image: CachedNetworkImageProvider(data[0]['preview_image'], headers: {'Host': API_HOST}), fit: BoxFit.cover)
+              image: DecorationImage(image: ResizeImage(CachedNetworkImageProvider(data[0]['preview_image'], headers: {'Host': API_HOST}), height: 100, width: 100, allowUpscaling: true), fit: BoxFit.cover)
             ),
             child: Container(
               decoration: BoxDecoration(
@@ -385,7 +388,7 @@ class _ProductPageState extends State<ProductPage> {
             height: 70,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(13),
-              image: DecorationImage(image: CachedNetworkImageProvider(model['preview_image'], headers: {'Host': API_HOST}), fit: BoxFit.cover)
+              image: DecorationImage(image: ResizeImage(CachedNetworkImageProvider(model['preview_image'], headers: {'Host': API_HOST}), height: 100, width: 100, allowUpscaling: true), fit: BoxFit.cover)
             ),
           ),
           onTap: () => {
@@ -402,7 +405,7 @@ class _ProductPageState extends State<ProductPage> {
             height: 70,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(13),
-              image: DecorationImage(image: CachedNetworkImageProvider(model['preview_image'], headers: {'Host': API_HOST}), fit: BoxFit.cover)
+              image: DecorationImage(image: ResizeImage(CachedNetworkImageProvider(model['preview_image'], headers: {'Host': API_HOST}), height: 100, width: 100, allowUpscaling: true), fit: BoxFit.cover)
             ),
             child: Container(
               decoration: BoxDecoration(

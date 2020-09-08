@@ -10,6 +10,7 @@ import 'package:g2r_market/pages/cabinet/account_edit.dart';
 import 'package:g2r_market/pages/cabinet/chat_items.dart';
 import 'package:g2r_market/pages/cabinet/product/list.dart';
 import 'package:g2r_market/pages/cabinet/profile/list.dart';
+import 'package:g2r_market/pages/manager/list_companies.dart';
 import 'package:g2r_market/widgets/cabinet_button.dart';
 import 'package:g2r_market/helpers/db.dart';
 import 'package:g2r_market/landing_page.dart';
@@ -188,7 +189,7 @@ class _SettingsPageState extends State<SettingsPage> {
               var auth = await DBProvider.db.getAuth();
 
               Navigator.push(context, AnimatedScaleRoute(
-                  builder: (context) => ProfileListPage(auth: auth)
+                  builder: (context) => CompanyListPage(auth: auth)
                 )
               );
             },

@@ -3,13 +3,11 @@ import 'dart:ui';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:flutter/material.dart';
-import 'package:g2r_market/helpers/db.dart';
 import 'package:g2r_market/helpers/navigator.dart';
-import 'package:g2r_market/pages/auth/sign_in_page.dart';
 import 'package:g2r_market/pages/cabinet/profile/create_buyer.dart';
 import 'package:g2r_market/pages/cabinet/profile/create_seller.dart';
 import 'package:g2r_market/pages/cabinet/profile/profile.dart';
-import 'package:g2r_market/services/profile.dart';
+import 'package:g2r_market/services/manager.dart';
 import 'package:g2r_market/widgets/bottom_navbar.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:g2r_market/widgets/custom_raised_button.dart';
@@ -18,12 +16,12 @@ import 'package:g2r_market/static/api_methods.dart';
 class CompanyProfileListPage extends StatefulWidget {
   
   final auth;
-  final fromMain;
+  final int companyId;
 
   CompanyProfileListPage({
     Key key,
-    this.fromMain: false,
-    this.auth
+    @required this.auth,
+    @required this.companyId
   }) : super(key: key);
 
   @override
@@ -63,7 +61,7 @@ class _CompanyProfileListPageState extends State<CompanyProfileListPage> {
             return __content(context, null, spinkit);
           default:
             if (snapshot.hasError || snapshot.data == null)
-              return SignInPage(fromMain: widget.fromMain,);
+              return __content(context, null, spinkit);
             else {
               return __content(context, snapshot.data, null);
             }
@@ -75,7 +73,7 @@ class _CompanyProfileListPageState extends State<CompanyProfileListPage> {
   __content(context, data, spinkit)
   {
     return Scaffold(
-      bottomNavigationBar: (widget.fromMain) ? null :  BottomNavBar(),
+      bottomNavigationBar: BottomNavBar(),
       body: Stack(
         children: <Widget>[
           SafeArea(
@@ -90,12 +88,10 @@ class _CompanyProfileListPageState extends State<CompanyProfileListPage> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
-                      (widget.fromMain == true)
-                      ? SizedBox(width: 20)
-                      : InkWell(
-                          child: Icon(Icons.arrow_back_ios),
-                          onTap: () => Navigator.pop(context, true),
-                        ),
+                      InkWell(
+                        child: Icon(Icons.arrow_back_ios),
+                        onTap: () => Navigator.pop(context, true),
+                      ),
                       Text('Профили', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
                       SizedBox(width: 20)
                     ],
@@ -151,7 +147,9 @@ class _CompanyProfileListPageState extends State<CompanyProfileListPage> {
                     child: Text('Создать профиль', style: TextStyle(color: Colors.white)),
                     onPressed: () => {
                       Navigator.push(context, AnimatedSizeRoute(
-                          builder: (context) => (_selectedProfileType == 'seller') ? SellerCreatePage(profiles: data) : BuyerCreatePage(profiles: data)
+                          builder: (context) => (_selectedProfileType == 'seller')
+                          ? SellerCreatePage(profiles: data, companyId: widget.companyId)
+                          : BuyerCreatePage(profiles: data, companyId: widget.companyId)
                         )
                       )
                     },
@@ -255,7 +253,7 @@ class _CompanyProfileListPageState extends State<CompanyProfileListPage> {
                           ),
                         ),
                         SizedBox(height: 20),
-                        (_selectedProfileType == 'seller')
+                        (_selectedProfileType == 'seller' && data[i].containsKey('company_description') && data[i]['company_description'].isNotEmpty)
                         ? Container(
                             width: 200,
                             child: Text(data[i]['company_description'], style: TextStyle(fontSize: 12), overflow: TextOverflow.ellipsis, maxLines: 2,)
@@ -276,14 +274,8 @@ class _CompanyProfileListPageState extends State<CompanyProfileListPage> {
 
   Future __getProfilesList() async
   {
-    var auth = await DBProvider.db.getAuth();
-    
-    if(auth == Null)
-    {
-      return 'NOT_AUTHORIZED';
-    }
 
-    var profiles = await Profile.getProfiles(auth, _selectedProfileType);
+    var profiles = await Manager.getProfiles(widget.auth, _selectedProfileType, widget.companyId);
 
     return profiles;
   }

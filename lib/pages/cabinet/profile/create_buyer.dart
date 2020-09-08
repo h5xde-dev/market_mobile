@@ -5,9 +5,11 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:g2r_market/helpers/navigator.dart';
 import 'package:g2r_market/helpers/db.dart';
+import 'package:g2r_market/helpers/user.dart';
 import 'package:g2r_market/landing_page.dart';
 import 'package:g2r_market/pages/auth/sign_in_page.dart';
 import 'package:g2r_market/pages/cabinet/profile/list.dart';
+import 'package:g2r_market/pages/manager/list_profiles.dart';
 import 'package:g2r_market/services/profile.dart';
 import 'package:g2r_market/widgets/custom_input.dart';
 import 'package:g2r_market/widgets/custom_raised_button.dart';
@@ -19,9 +21,11 @@ class BuyerCreatePage extends StatefulWidget{
 
   final double padding = 10;
   final profiles;
+  final companyId;
 
   BuyerCreatePage({
-    this.profiles,
+    @required this.profiles,
+    this.companyId: 0,
     Key key
   }) : super(key: key);
 
@@ -472,6 +476,8 @@ class _BuyerCreatePageState extends State<BuyerCreatePage> {
       Map<String, String> _data = {};
       Map _files = {};
 
+      List roles = await UserHelper.getRoles();
+
       _data = {
         'company_name': companyNameController.text.toString(),
         'region': regionController.text.toString(),
@@ -491,16 +497,29 @@ class _BuyerCreatePageState extends State<BuyerCreatePage> {
         'localisation': languageCompany.toLowerCase(),
       };
 
+      if(roles.contains('site_manager'))
+      {
+        _data['company_user'] = widget.companyId.toString();
+      }
+
       var result = await Profile.create(auth, _data, _files);
 
       if(result == true)
       {
-        Navigator.pushReplacement(context, AnimatedScaleRoute(
-          builder: (context) => ProfileListPage(
-              auth: auth,
+        (widget.companyId == 0)
+        ? Navigator.pushReplacement(context, AnimatedScaleRoute(
+            builder: (context) => ProfileListPage(
+                auth: auth,
+              )
             )
           )
-        );
+        : Navigator.pushReplacement(context, AnimatedScaleRoute(
+            builder: (context) => CompanyProfileListPage(
+                auth: auth,
+                companyId: widget.companyId,
+              )
+            )
+          );
       }
     }
   }

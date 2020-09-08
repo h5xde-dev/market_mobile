@@ -6,10 +6,10 @@ import 'package:flutter/material.dart';
 import 'package:g2r_market/helpers/db.dart';
 import 'package:g2r_market/helpers/navigator.dart';
 import 'package:g2r_market/pages/auth/sign_in_page.dart';
-import 'package:g2r_market/pages/cabinet/profile/create_buyer.dart';
-import 'package:g2r_market/pages/cabinet/profile/create_seller.dart';
 import 'package:g2r_market/pages/cabinet/profile/profile.dart';
-import 'package:g2r_market/services/profile.dart';
+import 'package:g2r_market/pages/manager/create_company.dart';
+import 'package:g2r_market/pages/manager/list_profiles.dart';
+import 'package:g2r_market/services/manager.dart';
 import 'package:g2r_market/widgets/bottom_navbar.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:g2r_market/widgets/custom_raised_button.dart';
@@ -18,12 +18,10 @@ import 'package:g2r_market/static/api_methods.dart';
 class CompanyListPage extends StatefulWidget {
   
   final auth;
-  final fromMain;
 
   CompanyListPage({
     Key key,
-    this.fromMain: false,
-    this.auth
+    @required this.auth
   }) : super(key: key);
 
   @override
@@ -62,11 +60,7 @@ class _CompanyListPageState extends State<CompanyListPage> {
           case ConnectionState.waiting:
             return __content(context, null, spinkit);
           default:
-            if (snapshot.hasError || snapshot.data == null)
-              return SignInPage(fromMain: widget.fromMain,);
-            else {
-              return __content(context, snapshot.data, null);
-            }
+            return __content(context, snapshot.data, null);
         }
       },
     );
@@ -75,7 +69,7 @@ class _CompanyListPageState extends State<CompanyListPage> {
   __content(context, data, spinkit)
   {
     return Scaffold(
-      bottomNavigationBar: (widget.fromMain) ? null :  BottomNavBar(),
+      bottomNavigationBar: BottomNavBar(),
       body: Stack(
         children: <Widget>[
           SafeArea(
@@ -90,12 +84,10 @@ class _CompanyListPageState extends State<CompanyListPage> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
-                      (widget.fromMain == true)
-                      ? SizedBox(width: 20)
-                      : InkWell(
-                          child: Icon(Icons.arrow_back_ios),
-                          onTap: () => Navigator.pop(context, true),
-                        ),
+                      InkWell(
+                        child: Icon(Icons.arrow_back_ios),
+                        onTap: () => Navigator.pop(context, true),
+                      ),
                       Text("Компании", style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
                       SizedBox(width: 20)
                     ],
@@ -105,41 +97,7 @@ class _CompanyListPageState extends State<CompanyListPage> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: <Widget>[
-                        InkWell(
-                          child: Container(
-                            padding: EdgeInsets.all(8),
-                            decoration: BoxDecoration(
-                              color: (_selectedProfileType == 'seller') ? Colors.black54 : Colors.white,
-                              borderRadius: BorderRadius.circular(13),
-                              border: Border.all(color: Colors.black54)
-                            ),
-                            child: Text('Продавец'),
-                          ),
-                          onTap: (){
-                            setState(() {
-                              _selectedProfileType = 'seller';
-                              _loaded = false;
-                            });
-                          },
-                        ),
-                        SizedBox(width: 20),
-                        InkWell(
-                          child: Container(
-                            padding: EdgeInsets.all(8),
-                            decoration: BoxDecoration(
-                              color: (_selectedProfileType == 'buyer') ? Colors.black54 : Colors.white,
-                              borderRadius: BorderRadius.circular(13),
-                              border: Border.all(color: Colors.black54)
-                            ),
-                            child: Text('Покупатель'),
-                          ),
-                          onTap: (){
-                            setState(() {
-                              _selectedProfileType = 'buyer';
-                              _loaded = false;
-                            });
-                          },
-                        )
+
                       ],
                     )
                   ),
@@ -148,10 +106,10 @@ class _CompanyListPageState extends State<CompanyListPage> {
                   ),
                   CustomRaisedButton(
                     color: Colors.deepPurple[700],
-                    child: Text('Создать профиль', style: TextStyle(color: Colors.white)),
+                    child: Text('Создать компанию', style: TextStyle(color: Colors.white)),
                     onPressed: () => {
                       Navigator.push(context, AnimatedSizeRoute(
-                          builder: (context) => (_selectedProfileType == 'seller') ? SellerCreatePage(profiles: data) : BuyerCreatePage(profiles: data)
+                          builder: (context) => CompanyCreatePage(auth: widget.auth)
                         )
                       )
                     },
@@ -176,20 +134,6 @@ class _CompanyListPageState extends State<CompanyListPage> {
         itemCount: data.length,
         itemBuilder: (BuildContext context, int i){
 
-          var status;
-
-          switch (data[i]['status']) {
-            case 'active':
-              status = 'Подтверждён';
-              break;
-            case 'wait':
-              status = 'Ожидает подтверждения';
-              break;
-            default:
-              status = 'Не подтверждён';
-              break;
-          }
-
           return Column(
             children: <Widget>[
               Divider(),
@@ -200,10 +144,9 @@ class _CompanyListPageState extends State<CompanyListPage> {
                   InkWell(
                     onTap: () => {
                       Navigator.push(context, AnimatedSizeRoute(
-                        builder: (context) => ProfilePage(
-                            profileId: data[i]['id'],
+                        builder: (context) => CompanyProfileListPage(
                             auth: widget.auth,
-                            profileType: _selectedProfileType
+                            companyId: data[i]['id'],
                           )
                         )
                       )
@@ -212,27 +155,11 @@ class _CompanyListPageState extends State<CompanyListPage> {
                       height: 80,
                       width: 80,
                       decoration: 
-                      (_selectedProfileType == 'seller')
-                      ? BoxDecoration(
-                          borderRadius: BorderRadius.circular(13),
-                          image: DecorationImage(image: CachedNetworkImageProvider(data[i]['company_logo_image'], headers: {'Host': API_HOST}), fit: BoxFit.fill)
-                        )
-                      : BoxDecoration(
-                          borderRadius: BorderRadius.circular(13),
-                          image: DecorationImage(image: AssetImage('resources/images/default_profile_image.png'), fit: BoxFit.fill)
-                        ),
-                      child: Align(
-                        alignment: Alignment.bottomRight,
-                        child: Container(
-                          height: 20,
-                          width: 20,
-                          decoration: BoxDecoration(
-                            color:Colors.white,
-                            image: DecorationImage(image: AssetImage('icons/flags/png/${(data[i]['localisation'].toString().toLowerCase() != 'zh') ? data[i]['localisation'].toString().toLowerCase() : 'cn'}.png', package: 'country_icons'), fit: BoxFit.fill),
-                            borderRadius: BorderRadius.circular(13)
-                          ),
-                        ),
-                      )
+                      BoxDecoration(
+                        borderRadius: BorderRadius.circular(13),
+                        image: DecorationImage(image: AssetImage('resources/images/default_profile_image.png'), fit: BoxFit.fill)
+                      ),
+                      child: Center()
                     ),
                   ),
                   Padding(
@@ -242,25 +169,18 @@ class _CompanyListPageState extends State<CompanyListPage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[
                         Container(
-                          child: Text(data[i]['company_name'], style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold), overflow: TextOverflow.clip, maxLines: 2)
+                          child: Text(data[i]['name'], style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold), overflow: TextOverflow.clip, maxLines: 2)
                         ),
                         Container(
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.start,
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: <Widget>[
-                              Text('Статус: ', style: TextStyle(color: Colors.black54),),
-                              Text(status)
+
                             ],
                           ),
                         ),
                         SizedBox(height: 20),
-                        (_selectedProfileType == 'seller')
-                        ? Container(
-                            width: 200,
-                            child: Text(data[i]['company_description'], style: TextStyle(fontSize: 12), overflow: TextOverflow.ellipsis, maxLines: 2,)
-                          )
-                        : Container()
                       ],
                     ),
                   ),
@@ -276,12 +196,9 @@ class _CompanyListPageState extends State<CompanyListPage> {
 
   Future __getCompaniesList() async
   {
-    var auth = await DBProvider.db.getAuth();
-    
-    if(auth == Null)
-    {
-      return 'NOT_AUTHORIZED';
-    }
+    List companies = await Manager.getCompanies(widget.auth);
+
+    return companies;
   }
 
   __updateCompanies()

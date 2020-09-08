@@ -215,7 +215,7 @@ class _ProfileListPageState extends State<ProfileListPage> {
                       (_selectedProfileType == 'seller')
                       ? BoxDecoration(
                           borderRadius: BorderRadius.circular(13),
-                          image: DecorationImage(image: CachedNetworkImageProvider(data[i]['company_logo_image'], headers: {'Host': API_HOST}), fit: BoxFit.fill)
+                          image: DecorationImage(image: ResizeImage(CachedNetworkImageProvider(data[i]['company_logo_image'], headers: {'Host': API_HOST}), height: 100, width: 100, allowUpscaling: true), fit: BoxFit.fill)
                         )
                       : BoxDecoration(
                           borderRadius: BorderRadius.circular(13),
@@ -255,7 +255,7 @@ class _ProfileListPageState extends State<ProfileListPage> {
                           ),
                         ),
                         SizedBox(height: 20),
-                        (_selectedProfileType == 'seller')
+                        (_selectedProfileType == 'seller' && data[i].containsKey('company_description') && data[i]['company_description'].isNotEmpty)
                         ? Container(
                             width: 200,
                             child: Text(data[i]['company_description'], style: TextStyle(fontSize: 12), overflow: TextOverflow.ellipsis, maxLines: 2,)
