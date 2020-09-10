@@ -201,7 +201,8 @@ class _CompanyProfileListPageState extends State<CompanyProfileListPage> {
                         builder: (context) => ProfilePage(
                             profileId: data[i]['id'],
                             auth: widget.auth,
-                            profileType: _selectedProfileType
+                            profileType: _selectedProfileType,
+                            companyId: widget.companyId,
                           )
                         )
                       )

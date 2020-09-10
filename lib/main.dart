@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:g2r_market/landing_page.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:g2r_market/pages/error.dart';
 
 void main() {
   runApp(MyApp());
@@ -31,6 +32,13 @@ class _MyAppState extends State<MyApp> {
    return MaterialApp(
      debugShowCheckedModeBanner: false,
       title: 'G2R Market',
+      builder:(BuildContext context, Widget widget) {
+        ErrorWidget.builder = (FlutterErrorDetails errorDetails) {
+          return ErrorPage().buildError(context, errorDetails);
+        };
+
+        return widget;
+      },
       theme: ThemeData(
         primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,

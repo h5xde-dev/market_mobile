@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:g2r_market/helpers/user.dart';
 import 'package:g2r_market/static/api_methods.dart';
 import 'package:http/http.dart' as http;
 import 'package:dio/dio.dart' as dio;
@@ -75,12 +76,21 @@ class Profile {
     return profileList;
   }
 
-  static Future<Map> getProfileInfo(auth, int profileId, String type) async
+  static Future<Map> getProfileInfo(auth, int profileId, String type, int companyId) async
   {
     Map profile = {};
 
+    var roles = await UserHelper.getRoles();
+
+    String url = MarketApi.getProfileInfo + '/$profileId';
+
+    if(roles.contains('site_manager'))
+    {
+      url = url + '?company=$companyId';
+    }
+
     final response = await http.Client().get(
-      MarketApi.getProfileInfo + '/$profileId',
+      url,
       headers: 
       {
         'Host': API_HOST,

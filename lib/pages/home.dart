@@ -42,12 +42,12 @@ class _HomePageState extends State<HomePage> {
       builder: (BuildContext context, AsyncSnapshot snapshot){
         switch (snapshot.connectionState) {
           case ConnectionState.none:
-            return __content(context, null, spinkit);
+            throw new Exception('not_connected');
           case ConnectionState.waiting:
             return __content(context, null, spinkit);
           default:
             if (snapshot.hasError)
-              return __content(context, null, spinkit);
+              throw new Exception('500');
             else {
               return __content(context, snapshot.data, null);
             }

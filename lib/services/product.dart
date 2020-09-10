@@ -1,7 +1,9 @@
 import 'package:g2r_market/static/api_methods.dart';
 import 'package:dio/dio.dart' as dio;
+import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
 import 'dart:async';
+import 'dart:convert';
 import 'dart:core';
 
 import 'package:path/path.dart';
@@ -68,5 +70,73 @@ class Product {
     }
 
     return result;
+  }
+
+  static Future<List> getCabinet(auth, type, profileId) async
+  {
+    List productList = [];
+
+    final url = MarketApi.getProductCabinet + "/$profileId/?type=$type";
+
+    final response = await http.Client().get(
+      url,
+      headers: {
+        'Host': API_HOST,
+        'Authorization': 'Bearer ${auth['token']}'
+      },
+    );
+
+    if(response.statusCode == 200)
+    {
+      var data = jsonDecode(response.body);
+
+      if(data.length == 0)
+      {
+        return null;
+      }
+
+      for (var item in data['data'])
+      {
+        print(item);
+
+        Map product = {
+          'id': item['id'],
+          'category': item['categories']['name'],
+        };
+
+        if(item.containsKey('downloads') != false)
+        {
+          for (var files in item['downloads'])
+          {
+            product.addEntries([MapEntry(files['type'], '$API_URL/storage/${files['path']}')]);
+          }
+        }
+
+        if(item.containsKey('product_prices') != false)
+        {
+          for (var price in item['product_prices'])
+          {
+            product.addEntries([MapEntry(price['min'], price['max'])]);
+          }
+        }
+
+        if(item.containsKey('product_models') != false)
+        {
+          for (var model in item['product_models'])
+          {
+            
+          }
+        }
+
+        for (var property in item['product_properties'])
+        {
+          product.addEntries([MapEntry(property['code'], property['value'])]);
+        }
+
+        productList.add(product);
+      }
+    }
+
+    return productList;
   }
 }

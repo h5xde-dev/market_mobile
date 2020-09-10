@@ -11,6 +11,7 @@ import 'package:g2r_market/helpers/profile.dart';
 import 'package:g2r_market/helpers/user.dart';
 import 'package:g2r_market/services/manager.dart';
 import 'package:g2r_market/services/profile.dart';
+import 'package:g2r_market/static/api_methods.dart';
 import 'package:g2r_market/widgets/bottom_navbar.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:g2r_market/widgets/custom_raised_button.dart';
@@ -21,13 +22,15 @@ class ProfilePage extends StatefulWidget {
 
   final int profileId;
   final String profileType;
+  final int companyId;
   final auth;
 
   ProfilePage({
     Key key,
     @required this.profileId,
     @required this.auth,
-    @required this.profileType
+    @required this.profileType,
+    this.companyId: 0
   }) : super(key: key);
 
   @override
@@ -332,7 +335,7 @@ class _ProfilePageState extends State<ProfilePage> {
                         width: MediaQuery.of(context).size.width,
                         height: 200,
                         decoration: BoxDecoration(
-                          image: DecorationImage(image: ResizeImage(CachedNetworkImageProvider(i), width:  500, height: 500, allowUpscaling: true), fit: BoxFit.fill)
+                          image: DecorationImage(image: ResizeImage(CachedNetworkImageProvider(i, headers: {'Host': API_HOST}), width:  1500, height: 1500, allowUpscaling: true,), fit: BoxFit.fill)
                         ),
                         margin: EdgeInsets.symmetric(horizontal: 5.0)
                       );
@@ -463,7 +466,7 @@ class _ProfilePageState extends State<ProfilePage> {
       return null;
     }
 
-    Map data = await Profile.getProfileInfo(auth, widget.profileId, widget.profileType);
+    Map data = await Profile.getProfileInfo(auth, widget.profileId, widget.profileType, widget.companyId);
 
     data.addAll({'active': (activeProfile != data['id']) ? false : true});
 

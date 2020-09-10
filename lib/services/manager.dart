@@ -42,7 +42,7 @@ class Manager {
     List profileList = [];
 
     final response = await http.Client().get(
-      MarketApi.getCompanyProfiles + "?user=$companyId",
+      MarketApi.getCompanyProfiles + "?user=$companyId&type=$type",
       headers: {
         'Host': API_HOST,
         'Authorization': 'Bearer ${auth['token']}'
@@ -77,6 +77,7 @@ class Manager {
 
         Map profile = {
           'id': item['id'],
+          'type': item['profile_type_id'],
           'status': item['status'],
           'localisation': localisation
         };

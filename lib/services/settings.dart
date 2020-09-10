@@ -28,49 +28,49 @@ class Settings {
 
       var avatar = '';
 
-        if(data.containsKey('avatar') != false)
+      if(data.containsKey('avatar') != false)
+      {
+        avatar = API_URL + '/storage/' + data['avatar']['path'];
+      }
+
+        var userMap = {
+            'userId': data['id'],
+            'name': data['name'],
+            'avatar': avatar
+        };
+        
+        if(data['roles'][0] != null)
         {
-          avatar = API_URL + '/storage/' + data['avatar']['path'];
+
+          List<String> roles = data['roles'].map<String>((role) {
+            return role.toString();
+          }).toList();
+
+          await UserHelper.setRoles(roles);
         }
 
-          var userMap = {
-              'userId': data['id'],
-              'name': data['name'],
-              'avatar': avatar
-          };
+        if(data.containsKey('account'))
+        {
+          for( var acc in data['account'].values )
+          {
+            userMap.addEntries([MapEntry(acc['code'], acc['value'])]);
+          }
+        }
+
+        UserBase user = UserBase.fromMap(userMap);
+
+        var accountCreated = await DBProvider.db.getAccountInfo();
+
+        if(accountCreated != Null)
+        {
+          await DBProvider.db.updateAccountInfo(user);
           
-          if(data['roles'][0] != null)
-          {
+        } else
+        {
+          await DBProvider.db.newAccountInfo(user);
+        }
 
-            List<String> roles = data['roles'].map<String>((role) {
-              return role.toString();
-            }).toList();
-
-            await UserHelper.setRoles(roles);
-          }
-
-          if(data.containsKey('account'))
-          {
-            for( var acc in data['account'].values )
-            {
-              userMap.addEntries([MapEntry(acc['code'], acc['value'])]);
-            }
-          }
-
-          UserBase user = UserBase.fromMap(userMap);
-
-          var accountCreated = await DBProvider.db.getAccountInfo();
-
-          if(accountCreated != Null)
-          {
-            await DBProvider.db.updateAccountInfo(user);
-            
-          } else
-          {
-            await DBProvider.db.newAccountInfo(user);
-          }
-
-        result = true;
+      result = true;
     }
 
     return result;

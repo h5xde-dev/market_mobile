@@ -5,6 +5,7 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:flutter/material.dart';
 import 'package:g2r_market/helpers/navigator.dart';
 import 'package:g2r_market/pages/cabinet/product/create.dart';
+import 'package:g2r_market/services/product.dart';
 import 'package:g2r_market/widgets/bottom_navbar.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:g2r_market/widgets/custom_raised_button.dart';
@@ -29,6 +30,7 @@ class ProductListPage extends StatefulWidget {
 class _ProductListPageState extends State<ProductListPage> {
 
   bool _loaded = false;
+  String _selectedType = 'active';
   var _data;
       
   @override
@@ -91,6 +93,67 @@ class _ProductListPageState extends State<ProductListPage> {
                       SizedBox(width: 20)
                     ],
                   ),
+                  Container(
+                    margin: EdgeInsets.symmetric(vertical: 10),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        InkWell(
+                          child: Container(
+                            padding: EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: (_selectedType == 'active') ? Colors.black54 : Colors.white,
+                              borderRadius: BorderRadius.circular(13),
+                              border: Border.all(color: Colors.black54)
+                            ),
+                            child: Text('Активные'),
+                          ),
+                          onTap: (){
+                            setState(() {
+                              _selectedType = 'active';
+                              _loaded = false;
+                            });
+                          },
+                        ),
+                        SizedBox(width: 20),
+                        InkWell(
+                          child: Container(
+                            padding: EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: (_selectedType == 'inactive') ? Colors.black54 : Colors.white,
+                              borderRadius: BorderRadius.circular(13),
+                              border: Border.all(color: Colors.black54)
+                            ),
+                            child: Text('Неактивные'),
+                          ),
+                          onTap: (){
+                            setState(() {
+                              _selectedType = 'inactive';
+                              _loaded = false;
+                            });
+                          },
+                        ),
+                        SizedBox(width: 20),
+                        InkWell(
+                          child: Container(
+                            padding: EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: (_selectedType == 'deleted') ? Colors.black54 : Colors.white,
+                              borderRadius: BorderRadius.circular(13),
+                              border: Border.all(color: Colors.black54)
+                            ),
+                            child: Text('Удалённые'),
+                          ),
+                          onTap: (){
+                            setState(() {
+                              _selectedType = 'deleted';
+                              _loaded = false;
+                            });
+                          },
+                        )
+                      ],
+                    )
+                  ),
                   Expanded(
                     child: ([null].contains(spinkit)) ? __getProfiles(data) : spinkit
                   ),
@@ -140,20 +203,10 @@ class _ProductListPageState extends State<ProductListPage> {
                       width: 80,
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(13),
-                        image: DecorationImage(image: CachedNetworkImageProvider(data[i]['preview_image'], headers: {'Host': API_HOST}), fit: BoxFit.fill)
+                        image: DecorationImage(image: (data[i].containsKey('preview_image'))
+                        ? CachedNetworkImageProvider(data[i]['preview_image'], headers: {'Host': API_HOST})
+                        : AssetImage('resources/images/default_profile_image.png'), fit: BoxFit.fill)
                       ),
-                      child: Align(
-                        alignment: Alignment.bottomRight,
-                        child: Container(
-                          height: 20,
-                          width: 20,
-                          decoration: BoxDecoration(
-                            color:Colors.white,
-                            image: DecorationImage(image: AssetImage('icons/flags/png/${(data[i]['localisation'].toString().toLowerCase() != 'zh') ? data[i]['localisation'].toString().toLowerCase() : 'cn'}.png', package: 'country_icons'), fit: BoxFit.fill),
-                            borderRadius: BorderRadius.circular(13)
-                          ),
-                        ),
-                      )
                     ),
                   ),
                   Padding(
@@ -168,7 +221,11 @@ class _ProductListPageState extends State<ProductListPage> {
                         SizedBox(height: 20),
                         Container(
                           width: 200,
-                          child: Text(data[i]['description'], style: TextStyle(fontSize: 12), overflow: TextOverflow.ellipsis, maxLines: 2,)
+                          child: Row(
+                            children: [
+                              /* Text(data[i]['min_price']) */
+                            ],
+                          )
                         )
                       ],
                     ),
@@ -185,7 +242,7 @@ class _ProductListPageState extends State<ProductListPage> {
 
   Future __getProductsList() async
   {
-    var products;
+    var products = Product.getCabinet(widget.auth, _selectedType, widget.profileId);
 
     return products;
   }
